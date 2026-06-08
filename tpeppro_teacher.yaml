@@ -1,0 +1,19 @@
+tpeppro:
+  model_root: otherModels/TPepPro
+  required_pair_schema:
+    - peptide_id
+    - target_id
+    - s_aff_pair
+
+templates:
+  private_R0:
+    peptides: outputs/processed/private_R0.csv
+    targets: outputs/processed/targets.csv
+    output: outputs/teacher_scores/tpeppro_private_R0_template.tsv
+
+raw_outputs:
+  private_R0:
+    raw: outputs/teacher_scores/tpeppro_private_R0_raw_predictions.csv
+    converted: outputs/teacher_scores/tpeppro_private_R0_pair_scores.csv
+    aggregated: outputs/teacher_scores/tpeppro_private_R0_aggregated.csv
+

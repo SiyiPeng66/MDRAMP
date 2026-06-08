@@ -1,0 +1,29 @@
+experts:
+  amp_prior:
+    class: AMPPriorExpert
+    hidden_dim: 512
+    dropout: 0.1
+  membrane:
+    class: MembraneMechanismExpert
+    hidden_dim: 512
+    dropout: 0.1
+  target_affinity:
+    class: PairAffinityExpert
+    hidden_dim: 512
+    dropout: 0.1
+
+gated_integrator:
+  tau: 0.5
+  gamma: 10.0
+  lambda_syn: 0.3
+
+training:
+  public_pretrain:
+    epochs: 50
+    batch_size: 64
+    learning_rate: 0.0001
+  round_finetune:
+    epochs: 10
+    batch_size: 16
+    learning_rate: 0.00001
+

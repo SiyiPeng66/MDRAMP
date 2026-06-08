@@ -1,0 +1,24 @@
+state:
+  default_state: M_R1
+
+paths:
+  target_fasta: data/target/target.fa
+  checkpoint_root: outputs/checkpoints
+  esm3_embedding_dir: outputs/esm3_embeddings
+  score_dir: outputs/scores
+  teacher_score_dir: outputs/teacher_scores
+
+sequence_filter:
+  allowed_aas: ACDEFGHIKLMNPQRSTVWY
+  min_length: 10
+  max_length: 50
+
+features:
+  use_esm3: true
+  use_physicochemical: true
+  esm3_batch_size: 8
+
+output:
+  include_component_scores: true
+  include_top_targets: true
+  top_k_targets: 5
