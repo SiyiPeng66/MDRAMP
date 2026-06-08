@@ -1,0 +1,45 @@
+round:
+  input_round: R0
+  from_state: M_R0
+  to_state: M_R1
+  private_data: data/private/R0.txt
+
+paths:
+  target_fasta: data/target/target.fa
+  processed_dir: outputs/processed
+  esm3_embedding_dir: outputs/esm3_embeddings
+  teacher_score_dir: outputs/teacher_scores
+  input_checkpoint_dir: outputs/checkpoints/M_R0
+  output_checkpoint_dir: outputs/checkpoints/M_R1
+  round_state_dir: outputs/round_states
+
+data_mode:
+  # sequence_only uses teacher-guided fine-tuning.
+  # supervised requires released OD/MIC/label columns.
+  mode: sequence_only
+
+sequence_filter:
+  allowed_aas: ACDEFGHIKLMNPQRSTVWY
+  min_length: 10
+  max_length: 50
+
+label_rules:
+  inhibition_positive_threshold: 95.0
+  resistant_potent_concentration_ug_ml: 32
+  resistant_active_concentration_ug_ml: 256
+
+fine_tuning:
+  freeze_esm3: true
+  amp_prior:
+    update: false
+    learning_rate: 0.000005
+  membrane_expert:
+    update: true
+    learning_rate: 0.00001
+    teacher_regularization_weight: 1.0
+  target_affinity_expert:
+    update: true
+    learning_rate: 0.000005
+    teacher_regularization_weight: 1.0
+  integrator:
+    recalibrate_only_with_supervised_labels: true
