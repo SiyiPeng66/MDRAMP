@@ -79,3 +79,55 @@ class AMPPriorExpert(MLPExpert):
 class MembraneMechanismExpert(MLPExpert):
     """Membrane mechanism expert distilled from Pore-Forming teacher."""
 
+
+class FeaturewiseGatedMembraneExpert(torch.nn.Module):
+    """Paper-shaped membrane Expert with masked auxiliary outputs."""
+
+    def __init__(self, esm_dim: int, physchem_dim: int = 32, hidden_dim: int = 256):
+        super().__init__()
+        self.sequence_branch = torch.nn.Sequential(
+            torch.nn.Linear(esm_dim, 512), torch.nn.GELU(), torch.nn.Dropout(0.1),
+            torch.nn.Linear(512, hidden_dim), torch.nn.GELU()
+        )
+        self.physchem_branch = torch.nn.Sequential(
+            torch.nn.Linear(physchem_dim, 128), torch.nn.GELU(),
+            torch.nn.Linear(128, 64), torch.nn.GELU(),
+            torch.nn.Linear(64, hidden_dim), torch.nn.GELU()
+        )
+        self.gate = torch.nn.Linear(hidden_dim * 2, hidden_dim)
+        self.primary = torch.nn.Linear(hidden_dim, 1)
+        self.auxiliary = torch.nn.ModuleList([torch.nn.Linear(hidden_dim, 1) for _ in range(4)])
+
+    def forward(self, peptide_embedding: torch.Tensor, physchem: torch.Tensor) -> dict[str, torch.Tensor]:
+        seq = self.sequence_branch(peptide_embedding)
+        pc = self.physchem_branch(physchem)
+        gate = torch.sigmoid(self.gate(torch.cat([seq, pc], dim=-1)))
+        fused = gate * seq + (1.0 - gate) * pc
+        return {
+            "primary": torch.sigmoid(self.primary(fused)).squeeze(-1),
+            "auxiliary": torch.stack([torch.sigmoid(head(fused)).squeeze(-1) for head in self.auxiliary], dim=-1),
+            "representation": fused,
+        }
+
+
+class ProjectedPairAffinityExpert(torch.nn.Module):
+    """Pair Expert with projected interaction and rank-k bilinear features."""
+
+    def __init__(self, peptide_dim: int, target_dim: int, physchem_dim: int = 32, projection_dim: int = 256, rank: int = 64):
+        super().__init__()
+        self.peptide_projection = torch.nn.Linear(peptide_dim, projection_dim)
+        self.target_projection = torch.nn.Linear(target_dim, projection_dim)
+        self.left_rank = torch.nn.Linear(projection_dim, rank, bias=False)
+        self.right_rank = torch.nn.Linear(projection_dim, rank, bias=False)
+        input_dim = projection_dim * 2 + physchem_dim + rank
+        self.head = torch.nn.Sequential(
+            torch.nn.Linear(input_dim, 512), torch.nn.GELU(), torch.nn.Dropout(0.1),
+            torch.nn.Linear(512, 256), torch.nn.GELU(), torch.nn.Linear(256, 1)
+        )
+
+    def forward(self, peptide_embedding: torch.Tensor, target_embedding: torch.Tensor, physchem: torch.Tensor) -> torch.Tensor:
+        pep = self.peptide_projection(peptide_embedding)
+        target = self.target_projection(target_embedding)
+        bilinear = self.left_rank(pep) * self.right_rank(target)
+        features = torch.cat([torch.abs(pep - target), pep * target, physchem, bilinear], dim=-1)
+        return torch.sigmoid(self.head(features)).squeeze(-1)

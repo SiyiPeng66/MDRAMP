@@ -20,10 +20,20 @@ def integrate_numpy(
     S_mem: np.ndarray,
     S_aff: np.ndarray,
     params: GateParams = GateParams(),
+    prior_std: np.ndarray | None = None,
+    mem_std: np.ndarray | None = None,
+    aff_std: np.ndarray | None = None,
+    kappa: float = 1.0,
 ) -> dict[str, np.ndarray]:
     S_prior = np.asarray(S_prior, dtype=np.float64)
     S_mem = np.asarray(S_mem, dtype=np.float64)
     S_aff = np.asarray(S_aff, dtype=np.float64)
+    if prior_std is not None:
+        S_prior = np.clip(S_prior - kappa * np.asarray(prior_std), 0.0, 1.0)
+    if mem_std is not None:
+        S_mem = np.clip(S_mem - kappa * np.asarray(mem_std), 0.0, 1.0)
+    if aff_std is not None:
+        S_aff = np.clip(S_aff - kappa * np.asarray(aff_std), 0.0, 1.0)
     g_prior = 1.0 / (1.0 + np.exp(-params.gamma * (S_prior - params.tau)))
     E_comp = 1.0 - (1.0 - S_mem) * (1.0 - S_aff)
     E_syn = S_mem * S_aff
@@ -63,4 +73,3 @@ class GatedIntegrator(torch.nn.Module):
             "E_mech": E_mech,
             "p_cons": p_cons,
         }
-

@@ -76,5 +76,25 @@ SCORE_SCHEMA = [
     "E_syn",
     "E_mech",
     "p_cons",
+    "predicted_log2_mic",
+    "A_t",
+    "R_t",
 ]
 
+MIC_LEDGER_SCHEMA = [
+    "peptide_id",
+    "round",
+    "mic_ug_ml",
+    "mic_log2",
+    "mic_censored",
+    "mic_censor_limit_log2",
+]
+
+STATE_MANIFEST_SCHEMA = [
+    "state_name",
+    "parent_state",
+    "visible_round",
+    "data_cutoff",
+    "frozen_components",
+    "input_hashes",
+]

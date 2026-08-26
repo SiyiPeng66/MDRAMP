@@ -26,7 +26,19 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=3)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--learning-rate", type=float, default=1e-5)
+    parser.add_argument(
+        "--allow-legacy-expert-finetune",
+        action="store_true",
+        help="Use the early-prototype membrane fine-tuning path; paper-faithful runs should omit this.",
+    )
     args = parser.parse_args()
+
+    if not args.allow_legacy_expert_finetune:
+        raise SystemExit(
+            "Paper-faithful R0-R3 updates do not fine-tune Expert weights. "
+            "Use src.train.train_mic_head for the MIC head, or explicitly pass "
+            "--allow-legacy-expert-finetune for the early prototype path."
+        )
 
     add_physicochemical_features(Path(args.round_csv), Path(args.features), sequence_column="sequence")
     df, matrix = load_peptide_matrix(
@@ -58,4 +70,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
