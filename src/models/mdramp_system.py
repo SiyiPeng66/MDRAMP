@@ -46,3 +46,16 @@ class MDRAMPSystem(torch.nn.Module):
             **integrated,
         }
 
+    def score_deployed(
+        self,
+        peptide_features: torch.Tensor,
+        S_aff: torch.Tensor,
+        predicted_log2_mic: torch.Tensor,
+    ) -> dict[str, torch.Tensor]:
+        """Return the paper's separated evidence and deployed priority scores."""
+
+        components = self.score_components(peptide_features, S_aff)
+        activity = torch.sigmoid(5.0 - predicted_log2_mic)
+        components["A_t"] = activity
+        components["R_t"] = components["p_cons"] * activity
+        return components

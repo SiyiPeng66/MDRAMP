@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import argparse
-import json
 from datetime import datetime, timezone
 from pathlib import Path
+
+from src.loop.state_manifest import StateManifest, write_manifest
 
 
 def write_state(
@@ -15,26 +16,21 @@ def write_state(
     parent_state: str | None = None,
     round_data: str | None = None,
     notes: str = "",
+    visible_round: str | None = None,
+    data_cutoff: str | None = None,
+    input_hashes: dict[str, str] | None = None,
 ) -> dict:
-    state = {
-        "state_name": state_name,
-        "parent_state": parent_state,
-        "round_data": round_data,
-        "created_at_utc": datetime.now(timezone.utc).isoformat(),
-        "notes": notes,
-        "frozen_components": [
-            "model_weights",
-            "feature_scaler",
-            "target_set",
-            "teacher_score_cache",
-            "gate_parameters",
-            "data_availability_cutoff",
-        ],
-    }
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    with output_path.open("w", encoding="utf-8") as handle:
-        json.dump(state, handle, indent=2)
-    return state
+    visible_round = visible_round or state_name.replace("M_", "")
+    data_cutoff = data_cutoff or datetime.now(timezone.utc).isoformat()
+    manifest = StateManifest(
+        state_name=state_name,
+        parent_state=parent_state,
+        visible_round=visible_round,
+        data_cutoff=data_cutoff,
+        input_hashes=input_hashes or {},
+        config={"round_data": round_data, "notes": notes},
+    )
+    return write_manifest(manifest, output_path)
 
 
 def main() -> None:
@@ -44,6 +40,8 @@ def main() -> None:
     parser.add_argument("--parent-state", default=None)
     parser.add_argument("--round-data", default=None)
     parser.add_argument("--notes", default="")
+    parser.add_argument("--visible-round", default=None)
+    parser.add_argument("--data-cutoff", default=None)
     args = parser.parse_args()
     state = write_state(
         args.state,
@@ -51,10 +49,11 @@ def main() -> None:
         parent_state=args.parent_state,
         round_data=args.round_data,
         notes=args.notes,
+        visible_round=args.visible_round,
+        data_cutoff=args.data_cutoff,
     )
     print(json.dumps(state, indent=2))
 
 
 if __name__ == "__main__":
     main()
-

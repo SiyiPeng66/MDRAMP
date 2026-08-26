@@ -1,0 +1,18 @@
+mic_head:
+  hidden_dim: 16
+  target: log2_mic
+  loss: censor_aware_huber
+  censor_limit_ug_ml: 256
+  censor_limit_log2: 8.0
+  activity_midpoint_log2_mic: 5.0
+  activity_temperature: 1.0
+  freeze_experts: true
+
+training:
+  epochs: 200
+  batch_size: 32
+  learning_rate: 0.00005
+
+state_policy:
+  update_component: mic_head_only
+  same_round_labels_visible: false

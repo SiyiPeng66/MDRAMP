@@ -18,6 +18,14 @@ gated_integrator:
   lambda_syn: 0.3
 
 training:
+  mic_head:
+    hidden_dim: 16
+    epochs: 200
+    batch_size: 32
+    learning_rate: 0.00005
+    censor_limit_log2: 8.0
+    activity_midpoint_log2_mic: 5.0
+    activity_temperature: 1.0
   public_pretrain:
     epochs: 50
     batch_size: 64
@@ -26,4 +34,3 @@ training:
     epochs: 10
     batch_size: 16
     learning_rate: 0.00001
-

@@ -2,14 +2,14 @@
 
 Mechanism-aware closed-loop modeling for multidrug-resistant antimicrobial peptide discovery.
 
-MDRAMP is a research codebase for reproducing the modeling logic of a hierarchical MDR-AMP discovery workflow. The project combines strict ESM3 peptide/protein representations, public AMP pretraining, private round fine-tuning, membrane-mechanism evidence, peptide-target interaction evidence, and a gated consensus scoring function for candidate prioritization.
+MDRAMP is an early research implementation of a hierarchical MDR-AMP discovery workflow. The project combines strict ESM3 peptide/protein representations, public AMP initialization, private-round state updates, membrane-mechanism evidence, peptide-target interaction evidence, quantitative MIC prioritization, and a gated consensus scoring function.
 
 ```text
-public AMP data -> M_R0
-private/R0 -> M_R1
-private/R1 -> M_R2
+public AMP data -> frozen Expert backbone + MIC head -> M_R0
+private/R0 labels -> next-state MIC update -> M_R1
+private/R1 labels -> next-state MIC update -> M_R2
 ...
-model state -> candidate scoring -> p_cons ranking
+model state -> p_cons + A_t -> R_t candidate ranking
 ```
 
 This repository is intended to be developed and released as an open-source implementation of the model workflow. It does not include alternative sequence encoders: ESM3 is the required representation model.
@@ -21,8 +21,8 @@ MDRAMP follows a multi-stage modeling strategy:
 1. Public AMP records from APD6, CAMP, DBAASP, dbAMP, and DRAMP are parsed, cleaned, deduplicated, and split into a public source-domain training set.
 2. ESM3 is used to generate peptide and target protein embeddings.
 3. A public-initialized model state, `M_R0`, is trained from public AMP data and teacher-derived membrane evidence.
-4. Released private round data, such as `private/R0.txt`, are used only to fine-tune the next model state, for example `M_R0 -> M_R1`.
-5. Candidates are scored by integrating AMP prior evidence, membrane-mechanism evidence, and target-affinity evidence through a manuscript-faithful gated consensus function.
+4. Released private round data are visible only to the subsequent state. In the paper-faithful path, R0-R3 update only the lightweight MIC head; ESM3, Expert ensembles and the consistency integrator remain frozen.
+5. Candidates receive the stable biological consistency score `p_cons`, MIC-derived activity priority `A_t`, and deployed ranking score `R_t = p_cons * A_t`.
 
 ## Key Features
 
@@ -38,6 +38,11 @@ MDRAMP follows a multi-stage modeling strategy:
   - Target Affinity Expert
 - Noisy-OR aggregation for peptide-target affinity evidence.
 - Gated consensus scoring for mechanism-aware candidate ranking.
+- Five-member ensemble and uncertainty-aware scoring interfaces.
+- Censor-aware log2(MIC) regression head and `R_t` deployment ranking.
+- State manifests and prequential label-isolation guards.
+- Candidate guardrails, mixed selection, Pareto selection and Pep-B optimization interfaces.
+- Post-campaign evidential calibration utilities.
 - Project-local outputs for processed data, embeddings, teacher scores, checkpoints, and final scores.
 
 ## Repository Layout
@@ -59,9 +64,11 @@ src/data/       data parsing, sequence cleaning, labels, and split utilities
 src/features/   ESM3 embedding generation and physicochemical descriptors
 src/external/   Pore-Forming and TPepPro adapters
 src/models/     expert modules, gated integrator, and system wrapper
-src/train/      public pretraining, private round fine-tuning, target-affinity training
-src/score/      target-affinity prediction, candidate scoring, contribution analysis
-src/loop/       model-state metadata
+src/train/      public pretraining, MIC-head training, legacy and round training interfaces
+src/score/      target-affinity prediction, deployed scoring, calibration and contribution analysis
+src/loop/       model-state manifests and prequential leakage guards
+src/selection/  candidate guardrails, mixed policy and Pareto selection
+src/optimization/ Pep-B directed optimization utilities
 src/utils/      FASTA, schema, hashing, and checkpoint helpers
 ```
 
@@ -107,9 +114,11 @@ E_comp(x) = 1 - (1 - S_mem(x)) * (1 - S_aff(x))
 E_syn(x) = S_mem(x) * S_aff(x)
 E_mech(x) = (1 - lambda_syn) * E_comp(x) + lambda_syn * E_syn(x)
 p_cons(x) = g_prior(x) * E_mech(x)
+A_t(x) = sigmoid(5 - predicted_log2_MIC(x))
+R_t(x) = p_cons(x) * A_t(x)
 ```
 
-`p_cons(x)` is used for ranking and model-state comparison. It should not be interpreted as an absolute probability of antimicrobial activity.
+`p_cons(x)` is the stable biological consistency-priority component, not an absolute probability. `A_t(x)` is the state-specific MIC-derived activity priority. `R_t(x)` is the prospective deployed ranking score. Post-campaign evidential probabilities are a separate calibration analysis and must not be used as the historical R0-R5 selection score.
 
 ## Installation
 
@@ -126,6 +135,15 @@ Install common runtime dependencies:
 ```bash
 pip install numpy pandas torch scikit-learn biopython pyyaml
 ```
+
+Run the dependency-light checks from the repository root:
+
+```bash
+pytest -q tests
+python scripts/dry_run_foundation.py
+```
+
+These checks do not require ESM3 or external teacher weights. Formal embedding and teacher inference require the external environments described below.
 
 Some components may require additional dependencies from ESM3, Pore-Forming, or TPepPro. For ESM3 checkpoint caching, use a project-local cache:
 
@@ -251,17 +269,19 @@ python -m src.train.train_target_affinity \
   --output outputs/checkpoints/M_R0/target_affinity_expert.pt
 ```
 
-### 7. Fine-Tune `M_R0 -> M_R1`
+### 7. Update the MIC head for `M_R0 -> M_R1`
+
+The manuscript-faithful R0-R3 update path trains only the lightweight quantitative MIC head. The old membrane Expert fine-tuning command is retained only as an explicitly marked early-prototype path and is not the paper workflow.
 
 ```bash
-python -m src.train.finetune_round \
-  --round-csv outputs/processed/private_R0.csv \
-  --features outputs/processed/private_R0_features.csv \
-  --embeddings outputs/esm3_embeddings/private_R0_peptides.npz \
-  --embedding-metadata outputs/esm3_embeddings/private_R0_peptides_metadata.csv \
-  --pore-scores outputs/teacher_scores/pore_private_R0.csv \
-  --from-checkpoint outputs/checkpoints/M_R0/membrane_expert.pt \
-  --output outputs/checkpoints/M_R1/membrane_expert.pt
+python -m src.train.train_mic_head \
+  --mic-ledger outputs/processed/mic_R0.csv \
+  --peptide-features outputs/processed/private_R0_features.csv \
+  --peptide-embeddings outputs/esm3_embeddings/private_R0_peptides.npz \
+  --peptide-embedding-metadata outputs/esm3_embeddings/private_R0_peptides_metadata.csv \
+  --expert-means outputs/scores/private_R0_expert_means.csv \
+  --peptide-id-column private_record_id \
+  --output outputs/checkpoints/M_R1/mic_head.pt
 ```
 
 For later rounds, replace the private round input and checkpoint paths according to the model-state transition:
@@ -297,6 +317,7 @@ python -m src.score.score_candidates \
   --amp-prior outputs/checkpoints/M_R0/amp_prior.pt \
   --membrane outputs/checkpoints/M_R1/membrane_expert.pt \
   --target-affinity outputs/teacher_scores/model_private_R0_aggregated.csv \
+  --mic-checkpoint outputs/checkpoints/M_R1/mic_head.pt \
   --output outputs/scores/candidate_scores.csv
 ```
 
@@ -336,6 +357,9 @@ E_comp
 E_syn
 E_mech
 p_cons
+predicted_log2_mic
+A_t
+R_t
 top_target_id
 top_target_score
 ```
@@ -346,6 +370,9 @@ top_target_score
 - `outputs/processed/processed_metadata.json` records processed data counts and provenance.
 - The in-repository public split uses deterministic length-aware identity clustering. If exact manuscript clustering is required, replace this stage with the same external clustering tool and threshold used in the original experiment.
 - TPepPro may require a separate legacy environment. MDRAMP consumes converted pair-level TPepPro predictions through a stable CSV schema.
+- Pore-Forming may require its original tokenizer, transformer and checkpoint environment. Import failures are reported explicitly; no substitute teacher is silently used.
+- HemoPI-2 is required for the R5 haemolysis-aware path. The repository includes an explicit adapter/blocked state, not a fabricated risk score.
+- The historical prospective ledger, fixed challenge set and archived checkpoints are not included in this early repository snapshot; manuscript-level result replay is blocked until those artifacts are supplied.
 - `outputs/` contains generated artifacts and can be excluded from version control except for small release examples.
 
 ## Closed-Loop Usage Rule
@@ -359,6 +386,19 @@ It must not be used for same-round:
 - candidate replacement
 - calibration
 - hyperparameter selection
+
+## Replication Status and Development Plan
+
+The paper-to-code implementation plan is maintained in [`docs/MDRAMP_PAPER_REPLICATION_PLAN_ZH.md`](docs/MDRAMP_PAPER_REPLICATION_PLAN_ZH.md). The current repository can run its data-processing path, foundation dry-run, formula/unit tests, template generation, and lightweight model interfaces. It cannot yet reproduce the complete manuscript campaign without the pinned external model environments, weights, historical model states, and experimental ledgers.
+
+Run the local checks before attempting external inference:
+
+```bash
+pytest -q tests
+python scripts/dry_run_foundation.py
+```
+
+The command `python -m src.train.finetune_round` is intentionally blocked by default because the manuscript does not update Expert weights during R0-R3. Use `src.train.train_mic_head` for the paper-faithful MIC-head update. Pass `--allow-legacy-expert-finetune` only when explicitly reproducing the early prototype behavior.
 
 ## Citation
 

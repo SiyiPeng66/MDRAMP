@@ -12,6 +12,7 @@ from src.features.physicochemical import add_physicochemical_features
 from src.models.expert_modules import AMPPriorExpert, MembraneMechanismExpert
 from src.models.gated_integrator import GateParams, integrate_numpy
 from src.train.train_utils import load_peptide_matrix, require_file
+from src.models.mic_regressor import MICRegressionHead, activity_priority
 
 
 def load_expert(path: Path, cls):
@@ -39,6 +40,7 @@ def main() -> None:
     parser.add_argument("--amp-prior", default="outputs/checkpoints/M_R0/amp_prior.pt")
     parser.add_argument("--membrane", default="outputs/checkpoints/M_R1/membrane_expert.pt")
     parser.add_argument("--target-affinity", required=True, help="Aggregated TPepPro/model S_aff CSV.")
+    parser.add_argument("--mic-checkpoint", default=None)
     parser.add_argument("--output", default="outputs/scores/candidate_scores.csv")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--tau", type=float, default=0.5)
@@ -74,6 +76,30 @@ def main() -> None:
         merged["S_aff"].to_numpy(),
         GateParams(tau=args.tau, gamma=args.gamma, lambda_syn=args.lambda_syn),
     )
+    if args.mic_checkpoint:
+        mic_ckpt = torch.load(require_file(args.mic_checkpoint), map_location="cpu")
+        mic_meta = mic_ckpt["metadata"]
+        mic = MICRegressionHead(
+            peptide_dim=mic_meta["peptide_dim"],
+            physchem_dim=mic_meta["physchem_dim"],
+        )
+        mic.load_state_dict(mic_ckpt["state_dict"])
+        mic.eval()
+        embedding_dim = mic_meta["peptide_dim"]
+        pc = torch.tensor(matrix[:, embedding_dim:], dtype=torch.float32)
+        pep = torch.tensor(matrix[:, :embedding_dim], dtype=torch.float32)
+        means = torch.tensor(
+            pd.DataFrame({"prior": S_prior, "mem": S_mem, "aff": merged["S_aff"]}).to_numpy(),
+            dtype=torch.float32,
+        )
+        with torch.no_grad():
+            predicted_mic = mic(pep, pc, means).numpy()
+            activity = activity_priority(torch.tensor(predicted_mic)).numpy()
+        deployed_score = integrated["p_cons"] * activity
+    else:
+        predicted_mic = None
+        activity = None
+        deployed_score = integrated["p_cons"]
     out = pd.DataFrame(
         {
             "sequence": df[args.sequence_column],
@@ -85,12 +111,15 @@ def main() -> None:
             "E_syn": integrated["E_syn"],
             "E_mech": integrated["E_mech"],
             "p_cons": integrated["p_cons"],
+            "predicted_log2_mic": predicted_mic,
+            "A_t": activity,
+            "R_t": deployed_score,
             "top_target_id": merged["top_target_id"],
             "top_target_score": merged["top_target_score"],
         }
     )
     out.insert(0, args.id_column, df[args.id_column])
-    out = out.sort_values("p_cons", ascending=False).reset_index(drop=True)
+    out = out.sort_values("R_t", ascending=False).reset_index(drop=True)
     out.insert(0, "rank", range(1, len(out) + 1))
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(args.output, index=False)
@@ -99,4 +128,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

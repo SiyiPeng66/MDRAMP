@@ -21,7 +21,7 @@ def main() -> None:
     parser.add_argument("--pore-scores", default="outputs/teacher_scores/pore_public.csv")
     parser.add_argument("--checkpoint-dir", default="outputs/checkpoints/M_R0")
     parser.add_argument("--device", default="cpu")
-    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--epochs", type=int, default=200)
     parser.add_argument("--batch-size", type=int, default=64)
     parser.add_argument("--learning-rate", type=float, default=1e-4)
     args = parser.parse_args()
@@ -33,6 +33,10 @@ def main() -> None:
         Path(args.embedding_metadata),
         id_column="sequence",
     )
+    if "split" in df.columns:
+        train_mask = df["split"].astype(str).eq("train")
+        df = df.loc[train_mask].reset_index(drop=True)
+        matrix = matrix[train_mask.to_numpy()]
 
     amp = AMPPriorExpert(input_dim=matrix.shape[1])
     amp_losses = train_binary_regressor(
@@ -75,4 +79,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
