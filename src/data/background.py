@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.data.clean_sequences import clean_peptide_sequence
+from src.data.cluster_split import length_aware_identity
 
 
 DEFAULT_EXCLUSION_TERMS = (
@@ -22,14 +23,16 @@ def build_operational_background(
     sequence_column: str = "sequence",
     description_columns: tuple[str, ...] = ("description", "annotation", "keywords"),
     target_lengths: pd.Series | None = None,
+    amp_sequences: tuple[str, ...] = (),
+    identity_threshold: float = 0.90,
+    seed: int = 2024,
     exclusion_terms: tuple[str, ...] = DEFAULT_EXCLUSION_TERMS,
 ) -> pd.DataFrame:
     """Filter a protein snapshot into length-matched operational background.
 
     The output is explicitly marked ``label_type=unlabelled``; it is never a
-    confirmed-negative set. Close-homology removal requires a project-specific
-    homology index and is therefore exposed as a later filter rather than
-    silently approximated here.
+    confirmed-negative set. Length matching preserves the complete positive
+    length histogram, and exact/global close homologues are removed.
     """
 
     df = pd.read_csv(input_csv)
@@ -51,9 +54,29 @@ def build_operational_background(
     )
     excluded = text.str.contains(term_re, na=False)
     result = result[result["is_valid"] & ~excluded].copy()
+    if amp_sequences:
+        amp_by_length: dict[int, list[str]] = {}
+        for sequence in amp_sequences:
+            amp_by_length.setdefault(len(sequence), []).append(sequence)
+        def is_close(sequence: str) -> bool:
+            low = int(len(sequence) * identity_threshold)
+            high = int(len(sequence) / identity_threshold) + 1
+            return any(
+                length_aware_identity(sequence, amp) >= identity_threshold
+                for length in range(low, high + 1)
+                for amp in amp_by_length.get(length, ())
+            )
+        result = result[~result["sequence"].map(is_close)]
     if target_lengths is not None and len(target_lengths):
-        lengths = set(target_lengths.astype(int).tolist())
-        result = result[result["sequence"].str.len().isin(lengths)]
+        required_counts = target_lengths.astype(int).value_counts().sort_index()
+        result = result.assign(_length=result["sequence"].str.len())
+        sampled = []
+        for length, count in required_counts.items():
+            available = result[result["_length"] == length]
+            if len(available) < count:
+                raise ValueError(f"Insufficient operational background at length {length}: {len(available)} < {count}")
+            sampled.append(available.sample(n=int(count), random_state=seed + int(length)))
+        result = pd.concat(sampled, ignore_index=True).drop(columns="_length")
     result = result.drop_duplicates("sequence").reset_index(drop=True)
     output_csv = Path(output_csv)
     output_csv.parent.mkdir(parents=True, exist_ok=True)

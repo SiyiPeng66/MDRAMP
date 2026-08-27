@@ -240,6 +240,7 @@ python -m src.external.convert_tpeppro_output \
 
 python -m src.external.tpeppro_wrapper aggregate \
   --pair-scores outputs/teacher_scores/tpeppro_private_R0_pair_scores.csv \
+  --aggregation-coefficient '<frozen manuscript experiment value>' \
   --output outputs/teacher_scores/tpeppro_private_R0_aggregated.csv
 ```
 
@@ -247,13 +248,25 @@ python -m src.external.tpeppro_wrapper aggregate \
 
 ```bash
 python -m src.train.pretrain_public \
-  --processed outputs/processed/public_cluster_split.csv \
-  --features outputs/processed/public_features.csv \
-  --embeddings outputs/esm3_embeddings/public_peptides.npz \
-  --embedding-metadata outputs/esm3_embeddings/public_peptides_metadata.csv \
+  --positive-features outputs/processed/public_features.csv \
+  --positive-embeddings outputs/esm3_embeddings/public_peptides.npz \
+  --positive-embedding-metadata outputs/esm3_embeddings/public_peptides_metadata.csv \
+  --background-features outputs/processed/swissprot_background_features.csv \
+  --background-embeddings outputs/esm3_embeddings/swissprot_background.npz \
+  --background-embedding-metadata outputs/esm3_embeddings/swissprot_background_metadata.csv \
+  --positive-prior '<frozen experiment value>' \
+  --manifold-loss-weight '<frozen experiment value>' \
+  --amp-branch-weight '<frozen experiment value>' \
   --pore-scores outputs/teacher_scores/pore_public.csv \
   --checkpoint-dir outputs/checkpoints/M_R0
 ```
+
+This command is strict: the AMP positive and operational-unlabelled sets must be
+1:1 length-matched sets. It writes five-member AMP and membrane ensembles plus
+the frozen state feature scaler. Missing membrane auxiliary annotations are
+masked and never converted to negative labels.
+The three AMP values above are required because the Word methods name these
+terms but do not report their frozen numeric values; no defaults are fabricated.
 
 Train the target-affinity expert from pair-level teacher scores:
 
@@ -266,8 +279,14 @@ python -m src.train.train_target_affinity \
   --target-embeddings outputs/esm3_embeddings/targets.npz \
   --target-embedding-metadata outputs/esm3_embeddings/targets_metadata.csv \
   --peptide-id-column private_record_id \
-  --output outputs/checkpoints/M_R0/target_affinity_expert.pt
+  --scaler outputs/checkpoints/M_R0/feature_scaler.json \
+  --output outputs/checkpoints/M_R0/target_affinity_ensemble.pt
 ```
+
+The pair table must contain equal numbers of `label_type=positive` and
+`label_type=background` rows. The trained ensemble uses the independent
+256-dimensional projections and rank-64 bilinear interaction described in the
+manuscript.
 
 ### 7. Update the MIC head for `M_R0 -> M_R1`
 
@@ -280,6 +299,9 @@ python -m src.train.train_mic_head \
   --peptide-embeddings outputs/esm3_embeddings/private_R0_peptides.npz \
   --peptide-embedding-metadata outputs/esm3_embeddings/private_R0_peptides_metadata.csv \
   --expert-means outputs/scores/private_R0_expert_means.csv \
+  --state-manifest outputs/checkpoints/M_R1/state_manifest.json \
+  --current-round R1 \
+  --scaler outputs/checkpoints/M_R0/feature_scaler.json \
   --peptide-id-column private_record_id \
   --output outputs/checkpoints/M_R1/mic_head.pt
 ```
@@ -296,15 +318,21 @@ Predict target-affinity evidence:
 
 ```bash
 python -m src.score.predict_target_affinity \
-  --checkpoint outputs/checkpoints/M_R0/target_affinity_expert.pt \
+  --checkpoint outputs/checkpoints/M_R0/target_affinity_ensemble.pt \
+  --scaler outputs/checkpoints/M_R0/feature_scaler.json \
   --peptide-features outputs/processed/private_R0_features.csv \
   --peptide-embeddings outputs/esm3_embeddings/private_R0_peptides.npz \
   --peptide-embedding-metadata outputs/esm3_embeddings/private_R0_peptides_metadata.csv \
   --target-embeddings outputs/esm3_embeddings/targets.npz \
   --target-embedding-metadata outputs/esm3_embeddings/targets_metadata.csv \
   --peptide-id-column private_record_id \
+  --aggregation-coefficient '<frozen manuscript experiment value>' \
   --aggregate-output outputs/teacher_scores/model_private_R0_aggregated.csv
 ```
+
+The Word methods state that the top-five attention and Noisy-OR terms use a
+prespecified coefficient but do not report its numeric value. The CLI therefore
+requires the archived experiment value explicitly and does not invent a default.
 
 Compute final gated consensus scores:
 
@@ -314,8 +342,9 @@ python -m src.score.score_candidates \
   --embeddings outputs/esm3_embeddings/private_R0_peptides.npz \
   --embedding-metadata outputs/esm3_embeddings/private_R0_peptides_metadata.csv \
   --id-column private_record_id \
-  --amp-prior outputs/checkpoints/M_R0/amp_prior.pt \
-  --membrane outputs/checkpoints/M_R1/membrane_expert.pt \
+  --scaler outputs/checkpoints/M_R0/feature_scaler.json \
+  --amp-prior outputs/checkpoints/M_R0/amp_prior_ensemble.pt \
+  --membrane outputs/checkpoints/M_R0/membrane_ensemble.pt \
   --target-affinity outputs/teacher_scores/model_private_R0_aggregated.csv \
   --mic-checkpoint outputs/checkpoints/M_R1/mic_head.pt \
   --output outputs/scores/candidate_scores.csv
@@ -340,7 +369,7 @@ peptide_id,target_id,s_aff_pair
 Aggregated target-affinity scores:
 
 ```text
-peptide_id,S_aff,top_target_id,top_target_score,target_count,teacher_model
+peptide_id,member_0,...,member_4,S_int_mean,S_int_std,top_target_id,top_target_score
 ```
 
 Candidate scores:
@@ -351,7 +380,10 @@ candidate id
 sequence
 S_prior
 S_mem
-S_aff
+S_int
+mu_prior,sigma_prior
+mu_mem,sigma_mem
+mu_int,sigma_int
 g_prior
 E_comp
 E_syn
@@ -368,10 +400,10 @@ top_target_score
 
 - ESM3 embeddings should be generated with the same ESM3 checkpoint and device settings for a given experiment.
 - `outputs/processed/processed_metadata.json` records processed data counts and provenance.
-- The in-repository public split uses deterministic length-aware identity clustering. If exact manuscript clustering is required, replace this stage with the same external clustering tool and threshold used in the original experiment.
+- The in-repository public split uses deterministic global alignment identity at the fixed 90% threshold, including insertion/deletion gaps.
 - TPepPro may require a separate legacy environment. MDRAMP consumes converted pair-level TPepPro predictions through a stable CSV schema.
 - Pore-Forming may require its original tokenizer, transformer and checkpoint environment. Import failures are reported explicitly; no substitute teacher is silently used.
-- HemoPI-2 is required for the R5 haemolysis-aware path. The repository includes an explicit adapter/blocked state, not a fabricated risk score.
+- HemoPI-2 is required for the R5 haemolysis-aware path. `src.selection.r5_safety` invokes a pinned external HemoPI-2 command after antibacterial scoring and rejects missing, failed or out-of-range risk outputs.
 - The historical prospective ledger, fixed challenge set and archived checkpoints are not included in this early repository snapshot; manuscript-level result replay is blocked until those artifacts are supplied.
 - `outputs/` contains generated artifacts and can be excluded from version control except for small release examples.
 
@@ -389,7 +421,7 @@ It must not be used for same-round:
 
 ## Replication Status and Development Plan
 
-The paper-to-code implementation plan is maintained in [`docs/MDRAMP_PAPER_REPLICATION_PLAN_ZH.md`](docs/MDRAMP_PAPER_REPLICATION_PLAN_ZH.md). The current repository can run its data-processing path, foundation dry-run, formula/unit tests, template generation, and lightweight model interfaces. It cannot yet reproduce the complete manuscript campaign without the pinned external model environments, weights, historical model states, and experimental ledgers.
+The paper-to-code implementation plan is maintained in [`docs/MDRAMP_PAPER_REPLICATION_PLAN_ZH.md`](docs/MDRAMP_PAPER_REPLICATION_PLAN_ZH.md). The active training and scoring entrypoints now enforce the paper Expert architectures, five-member ensembles, uncertainty adjustment, frozen scaler, prequential MIC update and complete `R_t` ranking. Exact numerical replay of the reported campaign remains blocked until the pinned external model environments and weights, archived 21,445-protein snapshot/panel, historical state checkpoints, experimental ledger and fixed challenge set are supplied.
 
 Run the local checks before attempting external inference:
 

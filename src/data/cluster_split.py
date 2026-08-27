@@ -13,19 +13,25 @@ class ClusterAssignment:
 
 
 def length_aware_identity(seq_a: str, seq_b: str) -> float:
-    """Return a simple global length-aware identity score.
-
-    This project uses a deterministic in-repository implementation for the data
-    layer. For publication-scale exact reproduction, this can later be replaced
-    by a pinned CD-HIT/MMseqs2 call while keeping the same output schema.
-    """
+    """Needleman-Wunsch global identity, including insertion/deletion gaps."""
 
     if not seq_a or not seq_b:
         return 0.0
-    max_len = max(len(seq_a), len(seq_b))
-    min_len = min(len(seq_a), len(seq_b))
-    matches = sum(1 for i in range(min_len) if seq_a[i] == seq_b[i])
-    return matches / max_len
+    # Each cell stores (matches, alignment_length); maximize identity numerator
+    # first and use the shortest alignment to break ties.
+    previous = [(0, j) for j in range(len(seq_b) + 1)]
+    for i, aa in enumerate(seq_a, 1):
+        current = [(0, i)]
+        for j, bb in enumerate(seq_b, 1):
+            candidates = (
+                (previous[j - 1][0] + int(aa == bb), previous[j - 1][1] + 1),
+                (previous[j][0], previous[j][1] + 1),
+                (current[j - 1][0], current[j - 1][1] + 1),
+            )
+            current.append(max(candidates, key=lambda item: (item[0], -item[1])))
+        previous = current
+    matches, aligned = previous[-1]
+    return matches / aligned
 
 
 def greedy_cluster_sequences(
@@ -86,4 +92,3 @@ def assign_cluster_splits(
             split = "test"
         split_map[cluster_id] = split
     return split_map
-

@@ -42,16 +42,30 @@ gated_integrator:
 
 training:
   amp_prior:
-    epochs: 50
-    batch_size: 64
+    epochs: 200
+    batch_size: 32
     learning_rate: 0.0001
+    ensemble_seeds: [11, 23, 37, 51, 73]
+    objective: nnPU_plus_manifold
+    positive_to_unlabelled_ratio: 1.0
+    positive_prior: REQUIRED_FROM_FROZEN_EXPERIMENT_CONFIG
+    manifold_loss_weight: REQUIRED_FROM_FROZEN_EXPERIMENT_CONFIG
+    branch_weight: REQUIRED_FROM_FROZEN_EXPERIMENT_CONFIG
   membrane_expert:
-    epochs: 50
-    batch_size: 64
+    epochs: 200
+    batch_size: 32
     learning_rate: 0.0001
     teacher_loss_weight: 1.0
+    ensemble_seeds: [11, 23, 37, 51, 73]
+    missing_auxiliary_labels: masked
   target_affinity_expert:
-    epochs: 30
+    epochs: 200
     batch_size: 32
     learning_rate: 0.00005
     teacher_loss_weight: 1.0
+    ensemble_seeds: [11, 23, 37, 51, 73]
+    projection_dim: 256
+    bilinear_rank: 64
+    positive_to_background_ratio: 1.0
+    aggregation_top_k: 5
+    attention_noisy_or_coefficient: REQUIRED_FROM_FROZEN_EXPERIMENT_CONFIG

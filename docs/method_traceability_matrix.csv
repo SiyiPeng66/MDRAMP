@@ -1,30 +1,30 @@
 id,section,requirement,current_status,target_module,acceptance_test
-M-DATA-01,Data,20-standard-amino-acid and 10-50-aa peptide eligibility,partial,src/data,fixture filtering test
+M-DATA-01,Data,20-standard-amino-acid and 10-50-aa peptide eligibility,implemented,src/data,fixture filtering test
 M-DATA-02,Data,90-percent cluster-level public split,implemented,src/data/cluster_split.py,split leakage test
-M-DATA-03,Data,UniProt Swiss-Prot operational unlabelled background,missing,src/data/background.py,background provenance test
-M-DATA-04,Data,Fixed 21445-sequence multi-target protein panel,missing,src/data/protein_panel.py,panel hash test
-M-DATA-05,Data,State-specific data cutoff and same-round label isolation,missing,src/loop/prequential_guard.py,leakage rejection test
+M-DATA-03,Data,UniProt Swiss-Prot operational unlabelled background,blocked_by_external_snapshot,src/data/background.py,background provenance test
+M-DATA-04,Data,Fixed 21445-sequence multi-target protein panel,blocked_by_external_snapshot,src/data/protein_panel.py,panel hash test
+M-DATA-05,Data,State-specific data cutoff and same-round label isolation,implemented,src/loop/prequential_guard.py,leakage rejection test
 M-FEAT-01,Representation,Frozen ESM3 1536-dimensional representation,partial,src/features/esm3_encoder.py,embedding hash test
 M-FEAT-02,Representation,32 physicochemical descriptors,implemented,src/features/physicochemical.py,descriptor value test
-M-FEAT-03,Representation,State-specific feature scaler,missing,src/features/scaler.py,cutoff test
-M-EXP-01,Experts,AMP Prior PU plus AMP-manifold branches,missing,src/models/amp_prior.py,loss and shape test
-M-EXP-02,Experts,Membrane sequence/physchem branches and masked auxiliary heads,missing,src/models/membrane_expert.py,masking test
-M-EXP-03,Experts,Interaction projected pair features and rank-64 bilinear term,missing,src/models/interaction_expert.py,pair shape test
-M-EXP-04,Experts,Five members with fixed seeds 11 23 37 51 73,missing,src/models/ensemble.py,member manifest test
-M-SCORE-01,Scoring,Uncertainty-adjusted Expert score mu minus kappa sigma,missing,src/models/gated_integrator.py,numeric formula test
-M-SCORE-02,Scoring,Fixed p_cons gated consistency-priority score,partial,src/models/gated_integrator.py,numeric formula test
-M-SCORE-03,Scoring,Noisy-OR and top-five attention interaction coverage,partial,src/external/tpeppro_wrapper.py,aggregation test
-M-MIC-01,Activity,16-unit log2-MIC regression head,missing,src/models/mic_regressor.py,forward shape test
-M-MIC-02,Activity,Huber and right-censored one-sided Huber loss,missing,src/models/mic_regressor.py,loss edge test
-M-MIC-03,Activity,Fixed A_t equals sigmoid of 5 minus predicted log2 MIC,missing,src/models/mic_regressor.py,mapping test
-M-MIC-04,Activity,Deployment score R_t equals p_cons times A_t,missing,src/score/score_candidates.py,ranking test
-M-LOOP-01,Loop,R0-R3 only update lightweight MIC head,partial,src/train/finetune_round.py,gradient isolation test
-M-SELECT-01,Selection,200-proposal pool and common candidate guardrails,missing,src/selection,filter fixture test
-M-SELECT-02,Selection,Mixed exploitation uncertainty diversity novelty policy,missing,src/selection,mix quota test
-M-SELECT-03,Selection,Frozen reserve list and replacement order,missing,src/selection,reserve replay test
-M-R45-01,Optimization,Pep-B constrained genetic algorithm,missing,src/optimization,parameter and constraint test
-M-R45-02,Optimization,HemoPI-2 post-antibacterial safety filtering,missing,src/external/hemopi_wrapper.py,dependency gate test
-M-CAL-01,Calibration,Post-campaign Beta evidence and vacuity,missing,src/models/evidential.py,probability test
-M-CAL-02,Calibration,ECE Brier NLL and reliability stress test,missing,src/score/calibration.py,metric fixture test
+M-FEAT-03,Representation,State-specific feature scaler,implemented,src/features/scaler.py,cutoff test
+M-EXP-01,Experts,AMP Prior PU plus AMP-manifold branches,blocked_by_missing_frozen_hyperparameters,src/models/expert_modules.py,loss and shape test
+M-EXP-02,Experts,Membrane sequence/physchem branches and masked auxiliary heads,implemented,src/models/expert_modules.py,masking test
+M-EXP-03,Experts,Interaction projected pair features and rank-64 bilinear term,implemented,src/models/expert_modules.py,pair shape test
+M-EXP-04,Experts,Five members with fixed seeds 11 23 37 51 73,implemented,src/models/ensemble.py,member manifest test
+M-SCORE-01,Scoring,Uncertainty-adjusted Expert score mu minus kappa sigma,implemented,src/models/gated_integrator.py,numeric formula test
+M-SCORE-02,Scoring,Fixed p_cons gated consistency-priority score,implemented,src/models/gated_integrator.py,numeric formula test
+M-SCORE-03,Scoring,Noisy-OR and top-five attention interaction coverage,blocked_by_missing_frozen_coefficient,src/external/tpeppro_wrapper.py,aggregation test
+M-MIC-01,Activity,16-unit log2-MIC regression head,implemented,src/models/mic_regressor.py,forward shape test
+M-MIC-02,Activity,Huber and right-censored one-sided Huber loss,implemented,src/models/mic_regressor.py,loss edge test
+M-MIC-03,Activity,Fixed A_t equals sigmoid of 5 minus predicted log2 MIC,implemented,src/models/mic_regressor.py,mapping test
+M-MIC-04,Activity,Deployment score R_t equals p_cons times A_t,implemented,src/score/score_candidates.py,ranking test
+M-LOOP-01,Loop,R0-R3 only update lightweight MIC head,implemented,src/train/train_mic_head.py,gradient isolation and leakage test
+M-SELECT-01,Selection,200-proposal pool and common candidate guardrails,implemented,src/selection/freeze_round.py,filter fixture test
+M-SELECT-02,Selection,Mixed exploitation uncertainty diversity novelty policy,implemented,src/selection,mix quota test
+M-SELECT-03,Selection,Frozen reserve list and replacement order,implemented,src/selection/freeze_round.py,reserve replay test
+M-R45-01,Optimization,Pep-B constrained genetic algorithm,implemented,src/optimization,parameter and constraint test
+M-R45-02,Optimization,HemoPI-2 post-antibacterial safety filtering,blocked_by_external_runtime,src/selection/r5_safety.py,dependency gate test
+M-CAL-01,Calibration,Post-campaign Beta evidence and vacuity,implemented,src/models/evidential.py,probability test
+M-CAL-02,Calibration,ECE Brier NLL and reliability stress test,implemented,src/score/calibration.py,metric fixture test
 M-EVAL-01,Evaluation,Fixed 96-candidate challenge replay,missing,src/evaluation,checkpoint replay test
 M-EVAL-02,Evaluation,Paper tables and figures regenerated from artifacts,missing,src/reports,report provenance test
