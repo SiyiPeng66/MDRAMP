@@ -11,6 +11,9 @@ import torch
 
 from src.features.embedding_store import EmbeddingStore
 from src.features.physicochemical import feature_columns
+from src.features.scaler import StateFeatureScaler
+from src.loop.prequential_guard import assert_no_current_round_labels, assert_round_cutoff
+from src.loop.state_manifest import load_manifest
 from src.models.mic_regressor import MICRegressionHead, censored_huber_loss
 from src.train.train_utils import require_file, save_checkpoint
 
@@ -58,6 +61,9 @@ def main() -> None:
     parser.add_argument("--peptide-embeddings", required=True)
     parser.add_argument("--peptide-embedding-metadata", required=True)
     parser.add_argument("--expert-means", required=True, help="CSV keyed by peptide_id with S_prior,S_mem,S_int.")
+    parser.add_argument("--state-manifest", required=True)
+    parser.add_argument("--current-round", required=True, choices=["R0", "R1", "R2", "R3"])
+    parser.add_argument("--scaler", required=True)
     parser.add_argument("--peptide-id-column", default="private_record_id")
     parser.add_argument("--output", required=True)
     parser.add_argument("--device", default="cpu")
@@ -67,13 +73,25 @@ def main() -> None:
     args = parser.parse_args()
 
     ledger = pd.read_csv(require_file(args.mic_ledger))
+    manifest = load_manifest(require_file(args.state_manifest))
+    manifest.assert_paper_policy()
+    assert_round_cutoff(ledger, visible_round=manifest.visible_round)
+    assert_no_current_round_labels(
+        ledger, current_round=args.current_round,
+        label_columns=("mic_log2", "mic_censored", "label_4class", "endpoint_256"),
+    )
     required = {"peptide_id", "mic_log2", "mic_censored"}
     if not required.issubset(ledger.columns):
         raise ValueError(f"MIC ledger missing columns: {sorted(required - set(ledger.columns))}")
     features = pd.read_csv(require_file(args.peptide_features))
+    pc_columns = feature_columns(features)
+    scaler = StateFeatureScaler.load(require_file(args.scaler))
+    if scaler.columns != pc_columns:
+        raise ValueError("MIC features do not match the frozen state scaler")
+    features.loc[:, pc_columns] = scaler.transform(features[pc_columns].to_numpy(dtype=np.float32))
     store = EmbeddingStore.load(args.peptide_embeddings, args.peptide_embedding_metadata)
     means = pd.read_csv(require_file(args.expert_means))
-    mean_cols = ["S_prior", "S_mem", "S_int"]
+    mean_cols = ["mu_prior", "mu_mem", "mu_int"]
     if not set(mean_cols).issubset(means.columns):
         raise ValueError(f"Expert means missing columns: {mean_cols}")
     key = args.peptide_id_column
@@ -96,11 +114,17 @@ def main() -> None:
     )
     save_checkpoint(model, Path(args.output), metadata={
         "peptide_dim": store.global_embeddings.shape[1],
-        "physchem_dim": len(feature_columns(features)),
+        "physchem_dim": len(pc_columns),
         "expert_dim": 3,
         "losses": losses,
         "target": "log2(MIC)",
         "censor_limit_log2": 8.0,
+        "paper_prequential_validated": True,
+        "state_name": manifest.state_name,
+        "visible_round": manifest.visible_round,
+        "current_round": args.current_round,
+        "data_cutoff": manifest.data_cutoff,
+        "scaler": str(Path(args.scaler)),
     })
     print(f"MIC head checkpoint -> {args.output}")
 

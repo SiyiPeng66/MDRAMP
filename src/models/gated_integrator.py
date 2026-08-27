@@ -60,7 +60,17 @@ class GatedIntegrator(torch.nn.Module):
         S_prior: torch.Tensor,
         S_mem: torch.Tensor,
         S_aff: torch.Tensor,
+        prior_std: torch.Tensor | None = None,
+        mem_std: torch.Tensor | None = None,
+        aff_std: torch.Tensor | None = None,
+        kappa: float = 1.0,
     ) -> dict[str, torch.Tensor]:
+        if prior_std is not None:
+            S_prior = torch.clamp(S_prior - kappa * prior_std, 0.0, 1.0)
+        if mem_std is not None:
+            S_mem = torch.clamp(S_mem - kappa * mem_std, 0.0, 1.0)
+        if aff_std is not None:
+            S_aff = torch.clamp(S_aff - kappa * aff_std, 0.0, 1.0)
         g_prior = torch.sigmoid(self.gamma * (S_prior - self.tau))
         E_comp = 1.0 - (1.0 - S_mem) * (1.0 - S_aff)
         E_syn = S_mem * S_aff
