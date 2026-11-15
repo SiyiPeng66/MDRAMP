@@ -29,7 +29,7 @@ def main() -> None:
     parser.add_argument("--target-limit", type=int)
     parser.add_argument("--pair-output", default="outputs/teacher_scores/model_pair_affinity.csv")
     parser.add_argument("--aggregate-output", default="outputs/teacher_scores/model_aggregated_affinity.csv")
-    parser.add_argument("--aggregation-coefficient", type=float, required=True)
+    parser.add_argument("--aggregation-coefficient", type=float, default=0.8)
     parser.add_argument("--device", default="cpu")
     args = parser.parse_args()
 
@@ -74,7 +74,7 @@ def main() -> None:
         aggregate_members.append(aggregate.set_index("peptide_id")["S_aff"].rename(f"member_{i}"))
     result = pd.concat(aggregate_members, axis=1)
     result["S_int_mean"] = result.mean(axis=1)
-    result["S_int_std"] = result[[f"member_{i}" for i in range(len(model.members))]].std(axis=1, ddof=0)
+    result["S_int_std"] = result[[f"member_{i}" for i in range(len(model.members))]].std(axis=1, ddof=1)
     best = pair_df.sort_values("s_aff_pair", ascending=False).groupby("peptide_id").first()
     result["top_target_id"] = best["target_id"]
     result["top_target_score"] = best["s_aff_pair"]

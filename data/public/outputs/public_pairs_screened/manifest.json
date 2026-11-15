@@ -1,0 +1,87 @@
+{
+  "algorithm_sha256": "358b4bc4abcd15b42ba8d79d7f57c4cd05342353a7a412736f2f2340d57f28bb",
+  "dataset_version": "public_pairs_screened",
+  "excluded_rows": 1457,
+  "exclusion_counts": {
+    "high_confidence_teacher_positive": 77,
+    "invalid_input:unverified_structure": 103,
+    "original_split_quarantine": 24,
+    "post_screen_balance_surplus": 1253
+  },
+  "historical_31248_reproduction": false,
+  "output_sha256": {
+    "all_pairs.csv": "185e9cfe68e05f27abd8b9dad2d7ed75b31b3c5b9a95155b173e27f4d87bf8ce",
+    "exclusions.csv": "59b4ea65075e8dd96288a33c4e91eaa79cf6e6dafcf2bf77c14dc20ff913790e",
+    "peptide_sequences.csv": "10a32f74a4ea709a6689beaf9df5544055a3ec51bf729326fd41c9b81d972af8",
+    "proteins.csv": "428cb393821ea7f683528169ce65ef8d59a959a5fca25799f29a1013f15fd891",
+    "test_pairs.csv": "453a981eafccf4f9e106a7bb7625957bfefaee803ace328d3aae86d66306b8f4",
+    "train_pairs.csv": "6f113080c23bd01bcef649bea649834c090eae24b0c3730510b0c83a42cef0f6",
+    "val_pairs.csv": "fef81995033acc057f929d69522d7612729bae3467a54a9e07263e332dcd8878"
+  },
+  "prott5_provenance": {
+    "path": "/Users/billy/PengSiyi/Workstation_Project1/MDRAMP/MDRAMP/outputs/public_tpeppro_embeddings/manifest.json",
+    "sha256": "6004d6e8b755e1f7394518ad562644cc62e5a89058b1aedf6e1694908e10b4f4"
+  },
+  "retained_rows": 9838,
+  "schema_version": 1,
+  "seed": 11,
+  "semantics": "Curated explicit positives plus operational background screened to finite teacher score <0.8, not experimentally verified nonbinding.",
+  "source_inputs": {
+    "all_pairs": {
+      "path": "/Users/billy/PengSiyi/Workstation_Project1/MDRAMP/MDRAMP/outputs/public_pairs/all_pairs.csv",
+      "sha256": "ede01ee1b3d70e80af2d611cb625570c05b485f7cc5aa653272a5a0b2f5152f5"
+    },
+    "public_manifest": {
+      "path": "/Users/billy/PengSiyi/Workstation_Project1/MDRAMP/MDRAMP/outputs/public_pairs/manifest.json",
+      "sha256": "e0f721b6622f313290a138cad9f71c28aeb5ecbb0d39891c4c4ff860cc8c5abe"
+    },
+    "scores": {
+      "path": "teacher_evidence/teacher_scores.csv",
+      "sha256": "dca70f3650fc7034e5e29241e6e456ace79e460d5b7ca8ef641399dfb00c7bf8"
+    },
+    "teacher_manifest": {
+      "path": "/Users/billy/PengSiyi/Workstation_Project1/MDRAMP/MDRAMP/outputs/public_tpeppro_scores/manifest.json",
+      "sha256": "dafbf7bb4a282ba47a9c478dfe75510bf321e5402b99984b981b83c0f8e94fa7"
+    },
+    "weights": {
+      "path": "teacher_evidence/tpeppro_teacher.pkl",
+      "sha256": "63acfcc7ccee563d2fce938ed84afe0dc3ed7ee3e773465b2af08c37a2598a20"
+    }
+  },
+  "source_rows": 11295,
+  "split_counts": {
+    "test": {
+      "background": 468,
+      "positive": 468
+    },
+    "train": {
+      "background": 3956,
+      "positive": 3956
+    },
+    "validation": {
+      "background": 495,
+      "positive": 495
+    }
+  },
+  "structures_provenance": {
+    "path": "/Users/billy/PengSiyi/Workstation_Project1/MDRAMP/MDRAMP/outputs/public_tpeppro_structures_v2/manifest.json",
+    "sha256": "d1bb1bceedcf9ff3c132ea4b758a0f60f3ed84cebc062a1f5a6fbee6136f045e"
+  },
+  "teacher_screening": {
+    "high_confidence_threshold": 0.8,
+    "scores": {
+      "path": "teacher_evidence/teacher_scores.csv",
+      "sha256": "dca70f3650fc7034e5e29241e6e456ace79e460d5b7ca8ef641399dfb00c7bf8"
+    },
+    "status": "completed",
+    "weights": {
+      "path": "teacher_evidence/tpeppro_teacher.pkl",
+      "sha256": "63acfcc7ccee563d2fce938ed84afe0dc3ed7ee3e773465b2af08c37a2598a20"
+    }
+  },
+  "v6_pair_curation_complete": true,
+  "release_relocation": {
+    "reason": "Portable teacher-screening evidence references; artifact bytes and hashes unchanged",
+    "original_dataset_version": "public_pairs_screened"
+  }
+}

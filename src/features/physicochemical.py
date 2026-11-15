@@ -67,8 +67,8 @@ def fraction(sequence: str, alphabet: set[str]) -> float:
     return sum(1 for aa in sequence if aa in alphabet) / len(sequence)
 
 
-def net_charge_ph74(sequence: str) -> float:
-    """Approximate net charge at pH 7.4."""
+def net_charge_ph70(sequence: str) -> float:
+    """Approximate net charge at pH 7.0."""
 
     return (
         sequence.count("K")
@@ -98,7 +98,7 @@ def compute_descriptors(sequence: str) -> dict[str, float]:
     boman_values = [BOMAN_SOLUBILITY[aa] for aa in sequence]
     row: dict[str, float] = {
         "pc_length": float(length),
-        "pc_net_charge_ph74": float(net_charge_ph74(sequence)),
+        "pc_net_charge_ph70": float(net_charge_ph70(sequence)),
         "pc_mean_hydrophobicity_kd": float(np.mean(hydrophobicities)) if length else 0.0,
         "pc_hydrophobic_fraction": fraction(sequence, HYDROPHOBIC),
         "pc_positive_fraction": fraction(sequence, POSITIVE),
@@ -122,6 +122,7 @@ def add_physicochemical_features(
     sequence_column: str = "sequence",
 ) -> pd.DataFrame:
     df = pd.read_csv(input_csv)
+    df = df.drop(columns=[column for column in df.columns if column.startswith("pc_")])
     features = pd.DataFrame([compute_descriptors(seq) for seq in df[sequence_column]])
     result = pd.concat([df.reset_index(drop=True), features], axis=1)
     output_csv.parent.mkdir(parents=True, exist_ok=True)

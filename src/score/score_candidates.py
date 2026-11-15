@@ -27,6 +27,8 @@ def load_ensemble(path: str, expected: str) -> tuple[ExpertEnsemble, dict]:
     else:
         factory = lambda: FeaturewiseGatedMembraneExpert(meta["esm_dim"], meta["physchem_dim"])
     model = ExpertEnsemble(factory, seeds=meta["seeds"], output_key=meta["output_key"])
+    if expected == "PaperAMPPriorExpert":
+        for i, member in enumerate(model.members): member.reference = torch.empty_like(ckpt["state_dict"][f"members.{i}.reference"]); member.reference_clusters = torch.empty_like(ckpt["state_dict"][f"members.{i}.reference_clusters"])
     model.load_state_dict(ckpt["state_dict"]); model.eval()
     return model, meta
 
@@ -43,7 +45,8 @@ def main() -> None:
     parser.add_argument("--amp-prior", required=True)
     parser.add_argument("--membrane", required=True)
     parser.add_argument("--target-affinity", required=True)
-    parser.add_argument("--mic-checkpoint", required=True)
+    parser.add_argument("--mic-checkpoint")
+    parser.add_argument("--experts-only", action="store_true", help="Export frozen expert means for initial MIC training; no deployment score")
     parser.add_argument("--output", default="outputs/scores/candidate_scores.csv")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--kappa", type=float, default=1.0)
@@ -51,6 +54,8 @@ def main() -> None:
     parser.add_argument("--gamma", type=float, default=10.0)
     parser.add_argument("--lambda-syn", type=float, default=0.3)
     args = parser.parse_args()
+    if not args.experts_only and not args.mic_checkpoint:
+        parser.error("--mic-checkpoint is required for deployed ranking")
 
     add_physicochemical_features(Path(args.candidates), Path(args.features), sequence_column=args.sequence_column)
     frame = pd.read_csv(require_file(args.features))
@@ -80,6 +85,19 @@ def main() -> None:
         GateParams(args.tau, args.gamma, args.lambda_syn), prior_std, mem_std,
         merged["S_int_std"].to_numpy(), args.kappa,
     )
+    output = merged[[args.id_column, args.sequence_column, "top_target_id", "top_target_score"]].copy()
+    output["mu_prior"], output["sigma_prior"] = prior_mean, prior_std
+    output["mu_mem"], output["sigma_mem"] = mem_mean, mem_std
+    output["mu_int"], output["sigma_int"] = merged["S_int_mean"], merged["S_int_std"]
+    output["S_prior"] = np.clip(prior_mean - args.kappa * prior_std, 0, 1)
+    output["S_mem"] = np.clip(mem_mean - args.kappa * mem_std, 0, 1)
+    output["S_int"] = np.clip(merged["S_int_mean"] - args.kappa * merged["S_int_std"], 0, 1)
+    for key, value in integrated.items(): output[key] = value
+    if args.experts_only:
+        output = output.rename(columns={args.id_column: "peptide_id"})
+        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+        output.to_csv(args.output, index=False)
+        return
     mic_ckpt = torch.load(require_file(args.mic_checkpoint), map_location="cpu")
     mic_meta = mic_ckpt["metadata"]
     if not mic_meta.get("paper_prequential_validated"):
@@ -90,17 +108,9 @@ def main() -> None:
     with torch.no_grad():
         predicted_mic = mic(torch.as_tensor(embeddings), torch.as_tensor(physchem), torch.as_tensor(means)).numpy()
         activity = activity_priority(torch.as_tensor(predicted_mic)).numpy()
-    output = merged[[args.id_column, args.sequence_column, "top_target_id", "top_target_score"]].copy()
-    output["mu_prior"], output["sigma_prior"] = prior_mean, prior_std
-    output["mu_mem"], output["sigma_mem"] = mem_mean, mem_std
-    output["mu_int"], output["sigma_int"] = merged["S_int_mean"], merged["S_int_std"]
-    output["S_prior"] = np.clip(prior_mean - args.kappa * prior_std, 0, 1)
-    output["S_mem"] = np.clip(mem_mean - args.kappa * mem_std, 0, 1)
-    output["S_int"] = np.clip(merged["S_int_mean"] - args.kappa * merged["S_int_std"], 0, 1)
-    for key, value in integrated.items(): output[key] = value
     output["predicted_log2_mic"], output["A_t"] = predicted_mic, activity
     output["R_t"] = output["p_cons"] * output["A_t"]
-    output = output.sort_values("R_t", ascending=False).reset_index(drop=True)
+    output = output.sort_values(["R_t",args.id_column], ascending=[False,True], kind="stable").reset_index(drop=True)
     output.insert(0, "rank", np.arange(1, len(output) + 1))
     Path(args.output).parent.mkdir(parents=True, exist_ok=True); output.to_csv(args.output, index=False)
 

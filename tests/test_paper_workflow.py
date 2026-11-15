@@ -13,23 +13,24 @@ from src.train.expert_losses import amp_prior_loss, masked_membrane_loss
 from src.selection.freeze_round import freeze_round_selection, next_reserve_candidate
 
 
-def test_amp_prior_uses_both_nnpu_and_manifold_branches():
-    model = PaperAMPPriorExpert(6, branch_weight=0.5)
-    positive, unlabelled = model(torch.ones(4, 6)), model(torch.zeros(4, 6))
-    loss = amp_prior_loss(positive, unlabelled)
+def test_amp_prior_uses_nnpu_and_frozen_support():
+    model = PaperAMPPriorExpert(40, branch_weight=.25)
+    z=torch.randn(15,8)
+    model.fit_support(z,list(range(15)))
+    positive=model(torch.cat([z,torch.zeros(15,32)],1))
+    loss=amp_prior_loss(positive,positive)
     loss.backward()
     assert model.pu_head.weight.grad is not None
-    assert model.manifold_head.weight.grad is not None
+    assert model.reference.grad is None
 
 
-def test_missing_membrane_auxiliary_labels_have_no_gradient():
-    model = FeaturewiseGatedMembraneExpert(8, 4)
-    output = model(torch.zeros(2, 8), torch.zeros(2, 4))
-    target = torch.tensor([[1.0, 0.0, 1.0, 0.0], [0.0, 1.0, 0.0, 1.0]])
-    mask = torch.zeros_like(target, dtype=torch.bool)
-    loss = masked_membrane_loss(output, torch.tensor([0.8, 0.2]), torch.ones(2, dtype=torch.bool), target, mask)
+def test_membrane_has_only_teacher_head():
+    model=FeaturewiseGatedMembraneExpert(8,4)
+    assert not hasattr(model,'auxiliary')
+    output=model(torch.zeros(2,8),torch.zeros(2,4))
+    loss=masked_membrane_loss(output,torch.tensor([.8,.2]),torch.ones(2,dtype=torch.bool))
     loss.backward()
-    assert all(head.weight.grad is None for head in model.auxiliary)
+    assert model.primary.weight.grad is not None
 
 
 def test_interaction_aggregation_is_sparse_top_five_plus_noisy_or():

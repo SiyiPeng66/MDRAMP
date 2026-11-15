@@ -26,7 +26,7 @@ def assert_no_current_round_labels(
     """
 
     if round_column not in frame.columns:
-        return
+        raise PrequentialLeakageError("Round provenance is required")
     labels = [column for column in label_columns if column in frame.columns]
     if not labels:
         return
@@ -51,7 +51,7 @@ def assert_round_cutoff(
     """Reject rows from rounds later than the state visibility cutoff."""
 
     if round_column not in frame.columns:
-        return
+        raise PrequentialLeakageError("Round provenance is required")
     observed = frame[round_column].dropna().astype(str)
     allowed = {f"R{i}" for i in range(int(str(visible_round).lstrip("R")) + 1)}
     future = sorted(set(observed) - allowed)

@@ -46,11 +46,11 @@ def aggregate_pair_frame(
         top = sorted_group.head(top_k)["s_aff_pair"].to_numpy(dtype=float)
         attention_logits = (
             sorted_group.head(top_k)["attention_logit"].to_numpy(dtype=float)
-            if "attention_logit" in sorted_group else top
+            if "attention_logit" in sorted_group else np.log(np.clip(top, 1e-7, 1-1e-7) / (1-np.clip(top,1e-7,1-1e-7)))
         )
         weights = np.exp(attention_logits - np.max(attention_logits))
         attention = float(np.sum((weights / weights.sum()) * top))
-        coverage = noisy_or(group["s_aff_pair"].to_numpy())
+        coverage = noisy_or(top)
         rows.append(
             {
                 "peptide_id": peptide_id,
@@ -132,7 +132,7 @@ def main() -> None:
     aggregate = sub.add_parser("aggregate")
     aggregate.add_argument("--pair-scores", required=True)
     aggregate.add_argument("--output", required=True)
-    aggregate.add_argument("--aggregation-coefficient", type=float, required=True)
+    aggregate.add_argument("--aggregation-coefficient", type=float, default=0.8)
 
     template = sub.add_parser("template")
     template.add_argument("--peptides", required=True)

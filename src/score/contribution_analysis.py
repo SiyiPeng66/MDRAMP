@@ -11,23 +11,24 @@ import pandas as pd
 from src.models.gated_integrator import GateParams, integrate_numpy
 
 
-def contribution_table(scores_csv: Path, output_csv: Path, params: GateParams) -> pd.DataFrame:
+def contribution_table(scores_csv: Path, output_csv: Path, params: GateParams, validation_scores: Path) -> pd.DataFrame:
     df = pd.read_csv(scores_csv)
     base = df["p_cons"].to_numpy()
+    validation = pd.read_csv(validation_scores)
     baselines = {
-        "prior": float(df["S_prior"].mean()),
-        "membrane": float(df["S_mem"].mean()),
-        "target_affinity": float(df["S_aff"].mean()),
+        "prior": float(validation["S_prior"].mean()),
+        "membrane": float(validation["S_mem"].mean()),
+        "target_affinity": float(validation["S_int"].mean()),
     }
     deltas = {}
     for key, column in {
         "prior": "S_prior",
         "membrane": "S_mem",
-        "target_affinity": "S_aff",
+        "target_affinity": "S_int",
     }.items():
         S_prior = df["S_prior"].to_numpy().copy()
         S_mem = df["S_mem"].to_numpy().copy()
-        S_aff = df["S_aff"].to_numpy().copy()
+        S_aff = df["S_int"].to_numpy().copy()
         if column == "S_prior":
             S_prior[:] = baselines[key]
         elif column == "S_mem":
@@ -51,6 +52,7 @@ def contribution_table(scores_csv: Path, output_csv: Path, params: GateParams) -
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--scores", required=True)
+    parser.add_argument("--validation-scores", required=True)
     parser.add_argument("--output", default="outputs/scores/contribution_analysis.csv")
     parser.add_argument("--tau", type=float, default=0.5)
     parser.add_argument("--gamma", type=float, default=10.0)
@@ -60,6 +62,7 @@ def main() -> None:
         Path(args.scores),
         Path(args.output),
         GateParams(args.tau, args.gamma, args.lambda_syn),
+        Path(args.validation_scores),
     )
     print(df.to_string(index=False))
 

@@ -38,30 +38,12 @@ def load_pore_module(model_root: Path) -> Any:
 class PoreFormingTeacher:
     """Required membrane-mechanism teacher wrapper."""
 
-    def __init__(self, model_root: str | Path = "otherModels/Pore-Forming") -> None:
-        self.model_root = Path(model_root)
-        self.module = load_pore_module(self.model_root)
+    def __init__(self, model_root="otherModels/Pore-Forming", device="cpu"):
+        from src.external.pore_runtime import PoreTeacherRuntime
+        self.runtime = PoreTeacherRuntime(model_root, device)
 
-    def score(self, sequence: str) -> float:
-        """Return a pore-forming probability when available, else hard label.
-
-        The formal preferred path is `predict_proba`. If the upstream script has
-        not yet been patched to expose probabilities, this returns its hard
-        prediction as a float while preserving the provenance as teacher output.
-        """
-
-        sequence = str(sequence).strip().upper()
-        if hasattr(self.module, "BERT_Extracting_seq_features") and hasattr(
-            self.module, "clf_choice"
-        ):
-            embedding = self.module.BERT_Extracting_seq_features(sequence)
-            clf = self.module.clf_choice
-            if hasattr(clf, "predict_proba"):
-                return float(clf.predict_proba(embedding)[0][1])
-            return float(clf.predict(embedding)[0])
-        if hasattr(self.module, "predict_amp"):
-            return float(self.module.predict_amp(sequence))
-        raise AttributeError("Pore-Forming module exposes neither predict_proba path nor predict_amp.")
+    def score(self, sequence):
+        return self.runtime.score(sequence)
 
 
 def score_csv(
@@ -71,9 +53,10 @@ def score_csv(
     model_root: Path,
     sequence_column: str = "sequence",
     id_column: str = "sequence",
+    device: str = "cpu",
 ) -> pd.DataFrame:
     df = pd.read_csv(input_csv)
-    teacher = PoreFormingTeacher(model_root)
+    teacher = PoreFormingTeacher(model_root, device)
     rows = []
     for row in df.itertuples(index=False):
         sequence = getattr(row, sequence_column)
@@ -99,13 +82,20 @@ def main() -> None:
     parser.add_argument("--model-root", default="otherModels/Pore-Forming")
     parser.add_argument("--sequence-column", default="sequence")
     parser.add_argument("--id-column", default="sequence")
+    parser.add_argument("--device", default="cpu")
+    parser.add_argument("--resume", action="store_true", help="Cache each score and resume identical input/model jobs")
     args = parser.parse_args()
-    df = score_csv(
+    scorer = score_csv
+    if args.resume:
+        from src.external.pore_cache import score_resumable
+        scorer = score_resumable
+    df = scorer(
         Path(args.input),
         Path(args.output),
         model_root=Path(args.model_root),
         sequence_column=args.sequence_column,
         id_column=args.id_column,
+        device=args.device,
     )
     print(f"Pore-Forming scores: {df.shape} -> {args.output}")
 

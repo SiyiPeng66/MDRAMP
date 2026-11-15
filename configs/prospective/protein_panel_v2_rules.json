@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-11-12T02:46:28.591839+00:00",
+  "purpose": "new_prospective_reference_panel_not_historical_replay",
+  "species": [
+    "Ab",
+    "Sa",
+    "Kp",
+    "Pa"
+  ],
+  "keyword_roots": {
+    "envelope": [
+      "KW-0472",
+      "KW-0134",
+      "KW-0448",
+      "KW-0573",
+      "KW-0574",
+      "KW-0777",
+      "KW-0961"
+    ],
+    "resistance": [
+      "KW-0046"
+    ]
+  },
+  "keyword_closure": {
+    "envelope": [
+      {
+        "name": "Cell wall",
+        "id": "KW-0134"
+      },
+      {
+        "name": "Lipopolysaccharide biosynthesis",
+        "id": "KW-0448"
+      },
+      {
+        "name": "Membrane",
+        "id": "KW-0472"
+      },
+      {
+        "name": "Peptidoglycan synthesis",
+        "id": "KW-0573"
+      },
+      {
+        "name": "Periplasm",
+        "id": "KW-0574"
+      },
+      {
+        "name": "Porin",
+        "id": "KW-0626"
+      },
+      {
+        "name": "S-layer",
+        "id": "KW-0701"
+      },
+      {
+        "name": "Signal-anchor",
+        "id": "KW-0735"
+      },
+      {
+        "name": "Teichoic acid biosynthesis",
+        "id": "KW-0777"
+      },
+      {
+        "name": "Transmembrane",
+        "id": "KW-0812"
+      },
+      {
+        "name": "Cell wall biogenesis/degradation",
+        "id": "KW-0961"
+      },
+      {
+        "name": "Cell inner membrane",
+        "id": "KW-0997"
+      },
+      {
+        "name": "Cell outer membrane",
+        "id": "KW-0998"
+      },
+      {
+        "name": "Cell membrane",
+        "id": "KW-1003"
+      },
+      {
+        "name": "Transmembrane helix",
+        "id": "KW-1133"
+      },
+      {
+        "name": "Transmembrane beta strand",
+        "id": "KW-1134"
+      }
+    ],
+    "resistance": [
+      {
+        "name": "Antibiotic resistance",
+        "id": "KW-0046"
+      },
+      {
+        "name": "Cycloheximide resistance",
+        "id": "KW-0196"
+      },
+      {
+        "name": "Trimethoprim resistance",
+        "id": "KW-0817"
+      }
+    ]
+  },
+  "keyword_source_sha256": "04b1003d5a53ed598795910f0d533185c9077784668f59fab64ca86cebb7c3ab",
+  "essential_support": {
+    "source": "official DEG experimentally determined bacterial records",
+    "mapping": "same species exact sequence first; otherwise alignment >=90% identity with >=90% coverage of each sequence and E<=1e-5",
+    "direct_label": "sequence_identical_to_DEG_record_not_assay_strain_validation",
+    "homology_label": "inferred_essentiality_support_not_experimental_validation"
+  },
+  "selection": "union of explicit envelope or resistance keyword annotation (including ontology descendants), exact DEG sequence or same-species DEG homology support; no MIC or peptide scores, no numeric panel cap",
+  "quality_exclusions": [
+    "nonstandard amino acid",
+    "fragment flag",
+    "sequence caution erroneous gene model/pseudogene when explicit"
+  ],
+  "no_length_truncation": true,
+  "reviewed_required": false,
+  "clustering": {
+    "identity": 0.9,
+    "both_sequence_coverage": 0.9,
+    "seq_id_mode": 0,
+    "alignment_mode": 3,
+    "cluster_mode": 2,
+    "single_step_clustering": true,
+    "stratification": "species, source proteome and three-bit evidence category signature",
+    "algorithm": "MMseqs2 greedy length representative, accession-sorted input",
+    "exact_sequence_collapse": "after clustering, keep all source membership metadata",
+    "cov_mode": 0,
+    "scope_claim": "90% identity/90% bidirectional coverage within source proteome and evidence category, not global 90% nonredundancy"
+  },
+  "sensitivity_cluster_identity": [
+    0.8,
+    0.95
+  ],
+  "limitations": [
+    "Reference strains are not verified assay isolates.",
+    "Keyword annotation is functional evidence, not evidence of AMP binding.",
+    "Essentiality transfer is condition-dependent and homology support is inferred.",
+    "No CARD-specific resistance mapping or experimental resistance confirmation is claimed.",
+    "Ranking stability and panel composition controls are subsequent validation, not completed by constructing this library."
+  ],
+  "non_bacterial_location_keywords": [
+    {
+      "name": "Coated pit",
+      "id": "KW-0168"
+    },
+    {
+      "name": "GPI-anchor",
+      "id": "KW-0336"
+    },
+    {
+      "name": "Postsynaptic cell membrane",
+      "id": "KW-0628"
+    },
+    {
+      "name": "Mitochondrion inner membrane",
+      "id": "KW-0999"
+    },
+    {
+      "name": "Mitochondrion outer membrane",
+      "id": "KW-1000"
+    },
+    {
+      "name": "Plastid inner membrane",
+      "id": "KW-1001"
+    },
+    {
+      "name": "Plastid outer membrane",
+      "id": "KW-1002"
+    },
+    {
+      "name": "Host cell inner membrane",
+      "id": "KW-1030"
+    },
+    {
+      "name": "Host cell membrane",
+      "id": "KW-1032"
+    },
+    {
+      "name": "Host cell outer membrane",
+      "id": "KW-1033"
+    },
+    {
+      "name": "Host membrane",
+      "id": "KW-1043"
+    },
+    {
+      "name": "Host mitochondrion inner membrane",
+      "id": "KW-1046"
+    },
+    {
+      "name": "Host mitochondrion outer membrane",
+      "id": "KW-1047"
+    },
+    {
+      "name": "Target cell membrane",
+      "id": "KW-1052"
+    },
+    {
+      "name": "Target membrane",
+      "id": "KW-1053"
+    }
+  ],
+  "generic_membrane_keywords_suppressed_when_foreign_location_present": [
+    "KW-0472",
+    "KW-0812",
+    "KW-0735",
+    "KW-1133",
+    "KW-1134",
+    "KW-0626"
+  ],
+  "revision": {
+    "timestamp": "2026-11-12T02:49:02.126860+00:00",
+    "reason": "Independent pre-selection semantic audit: host/target/organelle membrane is not evidence of bacterial envelope. Remove these descendants and suppress generic membrane parents when foreign-location annotations coexist unless independent bacterial envelope keyword remains.",
+    "previous_rules": "configs/prospective/protein_panel_v2_rules.initial.json",
+    "selection_counts_examined": false
+  },
+  "assay_source_policy": {
+    "requested_strains": {
+      "Ab_WT": "ATCC 19606",
+      "Sa_WT": "ATCC 25923",
+      "CRAB": "ATCC BAA-1605",
+      "MRSA": "ATCC 43300",
+      "CRPA": "Bio-109004",
+      "CRKP": "BNCC 359393"
+    },
+    "selection": "Prefer exact strain identifier match with a complete public proteome and auditable UniProtKB per-protein annotations; otherwise use the predetermined same-species annotated reference proteome and state the exact availability gap. Deduplicate reused source proteomes.",
+    "actual_assay_isolate_genome_verified": false,
+    "SPR_only_strain_not_screening": "MRSA TS274138",
+    "no_strain_phenotype_inference_from_name": true,
+    "preserve_cross_source_variants": "Near-identity clustering is within source proteome; only identical sequences merged across source proteomes."
+  },
+  "source_revision": {
+    "timestamp": "2026-11-12T03:05:04.605396+00:00",
+    "reason": "Main manuscript bacterial-strains paragraph supplies six exact strain identifiers; use it to correct species-only source selection before panel results exist. No MIC or peptide score used."
+  }
+}

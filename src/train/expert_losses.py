@@ -24,41 +24,12 @@ def non_negative_pu_loss(
     return positive_risk + torch.clamp(negative_risk - positive_as_negative, min=0.0)
 
 
-def amp_prior_loss(
-    positive: dict[str, torch.Tensor],
-    unlabelled: dict[str, torch.Tensor],
-    *,
-    positive_prior: float = 0.5,
-    manifold_weight: float = 1.0,
-) -> torch.Tensor:
-    pu = non_negative_pu_loss(
-        positive["pu"], unlabelled["pu"], positive_prior=positive_prior
-    )
-    eps = torch.finfo(positive["manifold"].dtype).eps
-    pos = positive["manifold"].clamp(eps, 1.0 - eps)
-    unl = unlabelled["manifold"].clamp(eps, 1.0 - eps)
-    manifold = 0.5 * ((-torch.log(pos)).mean() + (-torch.log1p(-unl)).mean())
-    return pu + manifold_weight * manifold
+def amp_prior_loss(positive, unlabelled, *, positive_prior=0.10, manifold_weight=0.0):
+    if manifold_weight != 0: raise ValueError("V6 has no manifold training loss")
+    return non_negative_pu_loss(positive["pu"],unlabelled["pu"],positive_prior=positive_prior)
 
 
-def masked_membrane_loss(
-    outputs: dict[str, torch.Tensor],
-    primary_target: torch.Tensor,
-    primary_mask: torch.Tensor,
-    auxiliary_target: torch.Tensor,
-    auxiliary_mask: torch.Tensor,
-    *,
-    teacher_weight: float = 1.0,
-) -> torch.Tensor:
-    """Continuous teacher BCE plus auxiliary BCE only where labels are visible."""
-
-    bce = torch.nn.functional.binary_cross_entropy
-    terms: list[torch.Tensor] = []
-    if primary_mask.bool().any():
-        terms.append(teacher_weight * bce(outputs["primary"][primary_mask], primary_target[primary_mask]))
-    valid_aux = auxiliary_mask.bool()
-    if valid_aux.any():
-        terms.append(bce(outputs["auxiliary"][valid_aux], auxiliary_target[valid_aux]))
-    if not terms:
-        raise ValueError("Membrane batch contains no supervised labels")
-    return torch.stack(terms).sum()
+def masked_membrane_loss(outputs, primary_target, primary_mask, auxiliary_target=None, auxiliary_mask=None, *, teacher_weight=1.0):
+    mask=primary_mask.bool() & torch.isfinite(primary_target) & (primary_target>=0) & (primary_target<=1) & ((primary_target<=.2)|(primary_target>=.8))
+    if not mask.any(): return outputs["primary"].sum()*0
+    return teacher_weight*torch.nn.functional.binary_cross_entropy(outputs["primary"][mask],primary_target[mask])

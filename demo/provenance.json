@@ -1,0 +1,119 @@
+{
+  "mic_unit": "\u03bcg/mL",
+  "mic_divided": false,
+  "observation_sources": [
+    {
+      "id": "AMP-DN01",
+      "strain": "Ab_WT",
+      "source": "reported_quantitative_MIC",
+      "mic": 8.0
+    },
+    {
+      "id": "AMP-DN01",
+      "strain": "Sa_WT",
+      "source": "reported_quantitative_MIC",
+      "mic": 4.0
+    },
+    {
+      "id": "AMP-DN01",
+      "strain": "CRAB",
+      "source": "reported_quantitative_MIC",
+      "mic": 16.0
+    },
+    {
+      "id": "AMP-DN01",
+      "strain": "MRSA",
+      "source": "reported_quantitative_MIC",
+      "mic": 4.0
+    },
+    {
+      "id": "AMP-DN01",
+      "strain": "CRKP",
+      "source": "user_assigned_lowest_positive_tested_dose",
+      "mic": 256.0
+    },
+    {
+      "id": "AMP-DN01",
+      "strain": "CRPA",
+      "source": "reported_quantitative_MIC",
+      "mic": 16.0
+    },
+    {
+      "id": "AMP-DN05",
+      "strain": "Ab_WT",
+      "source": "reported_quantitative_MIC",
+      "mic": 2.0
+    },
+    {
+      "id": "AMP-DN05",
+      "strain": "Sa_WT",
+      "source": "reported_quantitative_MIC",
+      "mic": 32.0
+    },
+    {
+      "id": "AMP-DN05",
+      "strain": "CRAB",
+      "source": "reported_quantitative_MIC",
+      "mic": 2.0
+    },
+    {
+      "id": "AMP-DN05",
+      "strain": "MRSA",
+      "source": "user_adjudicated_quantitative_MIC",
+      "mic": 32.0
+    },
+    {
+      "id": "AMP-DN05",
+      "strain": "CRKP",
+      "source": "user_assigned_lowest_positive_tested_dose",
+      "mic": 256.0
+    },
+    {
+      "id": "AMP-DN05",
+      "strain": "CRPA",
+      "source": "reported_quantitative_MIC",
+      "mic": 64.0
+    },
+    {
+      "id": "AMP-LO18",
+      "strain": "Ab_WT",
+      "source": "reported_quantitative_MIC",
+      "mic": 2.0
+    },
+    {
+      "id": "AMP-LO18",
+      "strain": "Sa_WT",
+      "source": "reported_quantitative_MIC",
+      "mic": 2.0
+    },
+    {
+      "id": "AMP-LO18",
+      "strain": "CRAB",
+      "source": "reported_quantitative_MIC",
+      "mic": 2.0
+    },
+    {
+      "id": "AMP-LO18",
+      "strain": "MRSA",
+      "source": "reported_quantitative_MIC",
+      "mic": 4.0
+    },
+    {
+      "id": "AMP-LO18",
+      "strain": "CRKP",
+      "source": "reported_quantitative_MIC",
+      "mic": 64.0
+    },
+    {
+      "id": "AMP-LO18",
+      "strain": "CRPA",
+      "source": "reported_quantitative_MIC",
+      "mic": 8.0
+    }
+  ],
+  "source_files": {
+    "outputs/calibration_screen_assigned_best_v1/strain_observations.csv": "31c8ad9b607f9a1af99ea5243804535b4174962a4ba392bf0731aa9a63280b6c",
+    "outputs/prospective_575_v1/features/expert_means.csv": "7f90dc57b5c6f2d36b8d61f394a89b63182a5ac3b7fa991b9bce5dec0cd5526c",
+    "outputs/preference_head_v1/trained_rank/model.pt": "a35114b035172d8032f58f86c563e3cf2b8544e83f33d9c84f4c2d67bd50af73"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "stages": [
+    {
+      "name": "experts",
+      "module": "src.train.pretrain_public",
+      "options": {
+        "positive-features": "DATA/outputs/public_features/public_features.csv",
+        "positive-embeddings": "DATA/outputs/public_embeddings_v2/public.npz",
+        "positive-embedding-metadata": "DATA/outputs/public_embeddings_v2/public_metadata.csv",
+        "background-features": "DATA/outputs/public_features/background_features.csv",
+        "background-embeddings": "DATA/outputs/public_background_embeddings/background.npz",
+        "background-embedding-metadata": "DATA/outputs/public_background_embeddings/background_metadata.csv",
+        "pore-scores": "DATA/outputs/public_teacher/pore_scores.csv",
+        "id-column": "peptide_id",
+        "checkpoint-dir": "OUT/experts",
+        "scaler-output": "OUT/experts/feature_scaler.json",
+        "device": "cpu",
+        "epochs": "200",
+        "batch-size": "64",
+        "learning-rate": "0.0001",
+        "weight-decay": "0.01",
+        "positive-prior": "0.1",
+        "amp-branch-weight": "0.25",
+        "teacher-weight": "1.0",
+        "ensemble-seeds": [
+          "11",
+          "23",
+          "37",
+          "51",
+          "73"
+        ]
+      }
+    },
+    {
+      "name": "interaction",
+      "module": "src.train.train_target_affinity",
+      "options": {
+        "pair-scores": "DATA/outputs/public_pairs_screened/train_pairs.csv",
+        "peptide-features": "DATA/outputs/public_features/pair_features.csv",
+        "peptide-embeddings": "DATA/outputs/public_pair_embeddings/peptides.npz",
+        "peptide-embedding-metadata": "DATA/outputs/public_pair_embeddings/peptides_metadata.csv",
+        "target-embeddings": "DATA/outputs/public_pair_embeddings/proteins.npz",
+        "target-embedding-metadata": "DATA/outputs/public_pair_embeddings/proteins_metadata.csv",
+        "peptide-id-column": "peptide_id",
+        "scaler": "OUT/experts/feature_scaler.json",
+        "output": "OUT/interaction.pt",
+        "device": "cpu",
+        "epochs": "200",
+        "batch-size": "32",
+        "learning-rate": "5e-05",
+        "weight-decay": "0.01",
+        "ensemble-seeds": [
+          "11",
+          "23",
+          "37",
+          "51",
+          "73"
+        ],
+        "curation-manifest": "DATA/outputs/public_pairs_screened/manifest.json",
+        "data-mode": "strict-v6"
+      }
+    },
+    {
+      "name": "generator",
+      "module": "src.generation.cli",
+      "prefix": [
+        "pretrain"
+      ],
+      "options": {
+        "data": "DATA/outputs/public_prepared/public_sequences.csv",
+        "output": "OUT/generator.pt",
+        "training-log": "OUT/generator.jsonl",
+        "training-state": "OUT/generator.training.pt",
+        "seed": 11,
+        "device": "cpu",
+        "epochs": 100,
+        "patience": 10,
+        "batch-size": 128,
+        "learning-rate": 0.0001,
+        "weight-decay": 0.0001,
+        "hidden": 256,
+        "heads": 8,
+        "layers": 4,
+        "feedforward": 1024,
+        "dropout": 0.1
+      }
+    }
+  ]
+}

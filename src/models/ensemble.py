@@ -30,4 +30,4 @@ class ExpertEnsemble(torch.nn.Module):
         if not all(isinstance(output, torch.Tensor) for output in member_outputs):
             raise TypeError("Ensemble members returned structured outputs; set output_key.")
         outputs = torch.stack(member_outputs, dim=0)
-        return {"members": outputs, "mean": outputs.mean(dim=0), "std": outputs.std(dim=0, unbiased=False)}
+        return {"members": outputs, "mean": outputs.mean(dim=0), "std": outputs.std(dim=0, unbiased=True)}

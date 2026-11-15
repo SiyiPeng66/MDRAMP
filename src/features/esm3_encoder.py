@@ -8,12 +8,17 @@ fails with an explicit setup error.
 from __future__ import annotations
 
 import json
+import threading
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import torch
+
+
+_SDK_LOAD_LOCK = threading.RLock()
 
 
 class ESM3SetupError(RuntimeError):
@@ -64,6 +69,7 @@ class ESM3Encoder:
         *,
         model_name: str = "esm3-sm-open-v1",
         device: str = "cuda",
+        weights_path: str | Path | None = None,
     ) -> None:
         ESM3, ESMProtein, LogitsConfig = _import_esm3()
         self._ESMProtein = ESMProtein
@@ -71,7 +77,32 @@ class ESM3Encoder:
         self.device = resolve_device(device)
         self.model_name = model_name
         try:
-            self.model = ESM3.from_pretrained(model_name).to(self.device)
+            with _SDK_LOAD_LOCK:
+                if weights_path is None:
+                    self.model = ESM3.from_pretrained(model_name, device=self.device)
+                else:
+                    # The official 3.2 SDK resolves all tokenizer resources via data_root.
+                    # Bind that resolver only during initialization to a complete pinned
+                    # snapshot, then restore it. Sequence-only inference uses no lazy decoders.
+                    weight = Path(weights_path).expanduser().absolute()
+                    if weight.name != "esm3_sm_open_v1.pth" or not weight.is_file():
+                        raise ValueError("esm_checkpoint must be the snapshot data/weights/esm3_sm_open_v1.pth path")
+                    snapshot = weight.parent.parent.parent
+                    if weight.parent.name != "weights" or weight.parent.parent.name != "data":
+                        raise ValueError("ESM3 weights require their companion snapshot data directory")
+                    import esm.pretrained as pretrained
+                    import esm.utils.constants.esm3 as constants
+                    previous_constants, previous_pretrained = constants.data_root, pretrained.data_root
+                    def local_root(name):
+                        if not name.startswith("esm3"):
+                            raise ValueError("Pinned ESM3 snapshot cannot load a different model")
+                        return snapshot
+                    try:
+                        constants.data_root = local_root
+                        pretrained.data_root = local_root
+                        self.model = ESM3.from_pretrained(model_name, device=self.device)
+                    finally:
+                        constants.data_root, pretrained.data_root = previous_constants, previous_pretrained
         except Exception as exc:  # pragma: no cover - depends on external weights
             raise ESM3SetupError(
                 f"Failed to load required ESM3 checkpoint {model_name!r}. "

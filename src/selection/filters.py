@@ -16,7 +16,7 @@ def passes_guardrails(sequence: str, *, reference_sequences: Iterable[str] = ())
         return False, clean.reason
     seq = clean.sequence
     desc = compute_descriptors(seq)
-    if not 2.0 <= desc["pc_net_charge_ph74"] <= 10.0:
+    if not 2.0 <= desc["pc_net_charge_ph70"] <= 10.0:
         return False, "net_charge_out_of_range"
     if not 0.30 <= desc["pc_hydrophobic_fraction"] <= 0.60:
         return False, "hydrophobic_fraction_out_of_range"
@@ -35,10 +35,8 @@ def passes_guardrails(sequence: str, *, reference_sequences: Iterable[str] = ())
 
 
 def identity(a: str, b: str) -> float:
-    if not a or not b:
-        return 0.0
-    n = min(len(a), len(b))
-    return sum(x == y for x, y in zip(a[:n], b[:n])) / max(len(a), len(b))
+    from src.data.cluster_split import length_aware_identity
+    return length_aware_identity(a, b)
 
 
 def enforce_pairwise_cosine(sequences: list[str], embeddings: np.ndarray, minimum: float = 0.10) -> list[int]:

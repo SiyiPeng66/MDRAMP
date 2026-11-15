@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
+import platform
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -42,7 +46,16 @@ def save_checkpoint(
     metadata: dict,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    torch.save({"state_dict": model.state_dict(), "metadata": metadata}, path)
+    metadata = dict(metadata)
+    metadata.setdefault("runtime", {"python": platform.python_version(), "torch": str(torch.__version__)})
+    metadata.setdefault("created_at_utc", datetime.now(timezone.utc).isoformat())
+    fd, temporary = tempfile.mkstemp(prefix="." + path.name, dir=path.parent)
+    os.close(fd)
+    try:
+        torch.save({"state_dict": model.state_dict(), "metadata": metadata}, temporary)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary): os.unlink(temporary)
 
 
 def save_json(data: dict, path: Path) -> None:

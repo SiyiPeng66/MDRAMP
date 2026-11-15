@@ -43,7 +43,12 @@ def parse_fasta_like(path: Path) -> list[dict[str, str]]:
 def parse_camp_csv(path: Path) -> list[dict[str, str]]:
     source = source_from_path(path)
     df = pd.read_csv(path, encoding="latin1")
+    df.columns = df.columns.str.strip()
+    if df.columns.duplicated().any():
+        raise ValueError(f"Duplicate CAMP columns after whitespace normalization: {path}")
     sequence_col = "Seqence" if "Seqence" in df.columns else "Sequence"
+    if sequence_col not in df or "Camp_ID" not in df:
+        raise ValueError(f"CAMP input requires Camp_ID and Sequence/Seqence columns: {path}")
     rows = []
     for _, row in df.iterrows():
         rows.append(

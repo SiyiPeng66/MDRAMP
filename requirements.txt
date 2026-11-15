@@ -1,0 +1,4 @@
+# Runtime for Python 3.12, including ESM3 and teacher-model dependencies.
+# Install with Python 3.12: python -m pip install -r requirements.txt
+# Keep exact versions in one canonical lock file.
+-r configs/requirements-runtime.lock.txt

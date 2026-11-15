@@ -1,0 +1,20 @@
+{
+  "training_plan.json": "0d693cd71138f7d19251e90664fa0dff4ca943178b3d211e1c5433b7f7e2ece5",
+  "outputs/public_teacher/pore_scores.csv": "17ab30a773aa18839dabde8a6ec1c49ce11dea11e960423539a3bbab6f16a0bc",
+  "outputs/public_background_embeddings/background_metadata.csv": "11503ba3e2b1e37700b3dddf0faab06af0aec61299a169e4090f89aca7ce5c23",
+  "outputs/public_background_embeddings/background.npz": "e9bb5c159bee1f2c4d250cd3e0fc2b27030c2a3305ba6a8f641fa592720b0ec9",
+  "outputs/public_features/pair_features.csv": "48b4f005bb3ed990403e329f5e6bbad3a2fb4e24022e191e37b68f11b56dece7",
+  "outputs/public_features/background_features.csv": "dc54e44a4db587e581ac4d84395d9e48c209abf6136469c72d49f648a1148a6d",
+  "outputs/public_features/public_features.csv": "6366c3319d3b8e725ac8cdc4c6a6646caf87549f1a3a050c5ff521a45ed2267a",
+  "outputs/public_pair_embeddings/peptides.npz": "852c3a45bc75f83061ab46efb4d4d0ff4d26b23879a9ee19c0bb59b0bac7d681",
+  "outputs/public_pair_embeddings/proteins.npz": "31eb4b279f9b3d83372dd1692d413459fa481cd85c10d9e8142d5bb84ba1f0fd",
+  "outputs/public_pair_embeddings/peptides_metadata.csv": "bb6fefe9e6d340f0b67120e8860e9fec3536aa5724daf9b1565414fb60ebed73",
+  "outputs/public_pair_embeddings/proteins_metadata.csv": "2c73d8166b01d321e7bc24d3742027b7bbe6fadec16581c74fb49c5345253a76",
+  "outputs/public_pairs_screened/train_pairs.csv": "6f113080c23bd01bcef649bea649834c090eae24b0c3730510b0c83a42cef0f6",
+  "outputs/public_pairs_screened/manifest.json": "3bb122de770bcee1cd0e0d25457152b5c97b34620879ee472ab9c5cfaf946951",
+  "outputs/public_embeddings_v2/public_metadata.csv": "9d85e6326109fc15daff1ff3cf36c83d21ddf792b5e7ffba04a02e0f0af6dafd",
+  "outputs/public_embeddings_v2/public.npz": "f3f97ecf24c19badec8da48c07d5e21bd68fb416971d9f52f9c9bd54a1332335",
+  "outputs/public_prepared/public_sequences.csv": "038a27edf9ce074b937a50d1d0b438c72ede09cd77fba1412c49788066d50dfa",
+  "outputs/public_pairs_screened/teacher_evidence/tpeppro_teacher.pkl": "63acfcc7ccee563d2fce938ed84afe0dc3ed7ee3e773465b2af08c37a2598a20",
+  "outputs/public_pairs_screened/teacher_evidence/teacher_scores.csv": "dca70f3650fc7034e5e29241e6e456ace79e460d5b7ca8ef641399dfb00c7bf8"
+}
