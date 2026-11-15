@@ -14,8 +14,8 @@
       "sha256": "2a73274ad14e4929bdf7b9ffb5f1881bea94dfe522b2bfa13ed006f7bc97708e"
     },
     "README.md": {
-      "size": 3896,
-      "sha256": "e2bd19756c1840636a55cba5f71a135269c2128a01923879f18652f3ce08ee74"
+      "size": 8204,
+      "sha256": "3d77d14e9e492b6ee192e1c563dc97a34ca73c853cf92b2933e628dae346cefd"
     },
     ".gitignore": {
       "size": 504,
@@ -26,8 +26,8 @@
       "sha256": "8b21c49d1680719e9f625bae9fd78b86407bb61801a8110503138015961a5e29"
     },
     "README-Zh.md": {
-      "size": 3558,
-      "sha256": "416b0db422f655b1f69a7995e68980bf8d93688798506b3b2ef8169b105293f8"
+      "size": 7604,
+      "sha256": "611e50aa7137ffe6877a71436e60c71e14ef41ef752516121d7c81cd24c184ec"
     },
     "demo/predict.fasta": {
       "size": 71,

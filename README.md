@@ -45,30 +45,113 @@ Outputs are saved to a new directory under `runs/`. Use `--output-dir DIR` to ch
 
 Use `--model BaseModel` or `--model path/to/model.pt` to select another starting model. Custom checkpoints require a companion `scorer.json`. Calibration saves a new model; add `--update-final` to make it the default.
 
-## Input and output
+## Command reference
 
-**Prediction:** FASTA, CSV, TSV or XLSX (first worksheet). Tables require `sequence`; `id` is optional. Use the 20 standard amino acids. Strain information is not required.
+All commands accept the following options:
 
-**Calibration:** CSV, TSV or XLSX, one observation per row:
-
-| Column | Required | Value |
+| Option | Default | Description |
 |---|---|---|
-| `sequence` | Yes | Amino acid sequence |
-| `mic` | Yes | Input MIC in μg/mL, e.g. `8` or `>128` |
-| `id` | No | Peptide identifier |
-| `strain` | No | Experimental strain |
-| `round` | No | Experimental round |
+| `--output-dir DIR` | New timestamped directory in `runs/` | Save results; the directory must not already exist. |
+| `--threads N` | `2` | CPU thread count. |
+| `--seed N` | `11` | Random seed; public expert ensembles use the fixed seeds in the training plan. |
+| `--help` | — | Show command-specific help. |
 
-The default calibration target is the best MIC across strains **divided by 10**. Do not pre-divide input values; use `--mic-divisor 1` for unscaled labels. See [model and data notes](docs/MODELS_AND_DATA.md) for label provenance and interpretation.
+### Training: `train`
 
-| Command | Main output |
-|---|---|
-| `predict` | `predictions.csv`: `id`, `sequence`, `predicted_mic` |
-| `calibrate` | `model.pt`, `scorer.json`, `calibration.csv` |
-| `generate` | `candidates.csv`, `candidates.fasta` |
-| `train` | Expert weights, generator and `scorer.json` |
+Train public-data experts and the autoregressive generator. Inputs are supplied by `data/public/training_plan.json`; this command does not accept `--input` or `--model`. Missing ESM3 features are computed and cached automatically. Recorded teacher scores are used as training inputs.
 
-Examples are in [`demo/`](demo/README.md); an empty calibration template is provided at [`templates/experiments.csv`](templates/experiments.csv). Training options include `--epochs`, `--batch-size`, `--learning-rate` and `--seed`. Add `--details` to prediction or generation for expert scores.
+```bash
+python main.py train --epochs 100 --batch-size 32 --output-dir runs/public_training
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `--epochs N` | `100` | Epoch limit for each training stage. |
+| `--batch-size N` | `32` | Training batch size. |
+| `--learning-rate X` | `0.0001` | Learning rate for all stages. |
+
+**Outputs:** `experts/` (expert weights and scaler), `interaction.pt`, `generator.pt`, `scorer.json`, training logs and a manifest. The new bundle has no MIC head and does not replace the default model. Initialize its MIC head with:
+
+```bash
+python main.py calibrate --model runs/public_training/scorer.json --input demo/experiments.csv
+```
+
+### Iterative calibration: `calibrate`
+
+Update the MIC head from experimental observations, retaining the frozen encoder and experts. By default this continues from the currently registered FinalModel.
+
+```bash
+python main.py calibrate --input demo/experiments.csv --output-dir runs/calibration
+# Use this calibrated model for subsequent prediction
+python main.py predict --model runs/calibration/model.pt --input demo/predict.fasta
+```
+
+**Input:** CSV, TSV or XLSX (first worksheet), one observation per row. Headers are case-sensitive.
+
+| Column | Required | Description |
+|---|---|---|
+| `sequence` | Yes | Amino acid sequence. |
+| `mic` | Yes | Original-scale MIC in μg/mL, e.g. `8` or `>128`. |
+| `id` | No | Peptide identifier. |
+| `strain` | No | Experimental strain, for traceability. |
+| `round` | No | Experimental round. |
+
+Use [`templates/experiments.csv`](templates/experiments.csv) or [`demo/experiments.csv`](demo/experiments.csv). The best MIC interval across strains is used for each sequence. The default target is **divided by 10**; do not pre-divide inputs. Use `--mic-divisor 1` for unscaled labels.
+
+| Option | Default | Description |
+|---|---|---|
+| `--input FILE` | Required | Experimental table. |
+| `--model MODEL` | `FinalModel` | `FinalModel`, `BaseModel`, or a checkpoint/configuration path. |
+| `--epochs N` | `100` | Calibration epochs. |
+| `--batch-size N` | `32` | Calibration batch size. |
+| `--learning-rate X` | `0.0001` | Calibration learning rate. |
+| `--mic-divisor X` | `10` | Positive divisor applied to training MIC labels. |
+| `--update-final` | Off | Register the successfully calibrated model as the default FinalModel. |
+
+**Outputs:** `model.pt`, `scorer.json`, `calibration.csv` (`id`, `sequence`, `before_mic`, `after_mic`), processed observations/targets and training provenance. `before_mic` is empty when initializing from BaseModel. Preserve referenced shared assets when moving a calibrated bundle.
+
+### Activity prediction: `predict`
+
+Predict one MIC per peptide using FinalModel or a calibrated custom model. BaseModel must be calibrated first.
+
+```bash
+python main.py predict --input demo/predict.fasta --details --output-dir runs/prediction
+```
+
+**Input:** FASTA, CSV, TSV or XLSX (first worksheet). Tables require `sequence`; `id` is optional. FASTA titles supply identifiers. Only the 20 standard amino acids are accepted; whitespace is removed and letters are uppercased. Strain information is not required.
+
+```csv
+id,sequence
+AMP-DN01,FLRRLVKWLKKM
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `--input FILE` | Required | Sequence file. |
+| `--model MODEL` | `FinalModel` | Registered model or calibrated checkpoint/configuration path. |
+| `--details` | Off | Also save expert scores in `details.csv`. |
+
+**Outputs:** `predictions.csv` with `id`, `sequence`, `predicted_mic` (μg/mL), and `run.json` with parameters and asset hashes. Example inputs and reference outputs are in [`demo/`](demo/README.md).
+
+### Candidate generation: `generate`
+
+Sample the pretrained generator, filter and deduplicate sequences, exclude previously tested exact sequences, then rank candidates by the selected model's composite score `R_t` (not by MIC alone). No input file is required.
+
+```bash
+python main.py generate --count 100 --details --output-dir runs/candidates
+```
+
+| Option | Default | Description |
+|---|---|---|
+| `--model MODEL` | `FinalModel` | Model used to score candidates; requires a MIC head. |
+| `--count N` | `100` | Number of candidates to return. |
+| `--pool-multiplier N` | `3` | Target eligible pool size relative to `count`; sampling batches may exceed it. |
+| `--max-proposals N` | `20000` | Maximum sampled sequences before filtering. |
+| `--temperature X` | `1.0` | Positive sampling temperature. |
+| `--top-p X` | `0.95` | Nucleus sampling probability, `0 < X ≤ 1`. |
+| `--details` | Off | Also save expert scores and `R_t` in `details.csv`. |
+
+**Outputs:** `candidates.csv` (`rank`, `id`, `sequence`, `predicted_mic` in μg/mL), `candidates.fasta` and `run.json`. If fewer than `count` candidates pass filters, the command fails; increase `--max-proposals`. If at least `count` pass, it can return results even when the target pool size is not reached.
 
 ## Model and data notes
 
