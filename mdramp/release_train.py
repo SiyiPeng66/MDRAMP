@@ -11,14 +11,14 @@ def run(a):
  plan_path=ROOT/'data/public/training_plan.json'
  if not plan_path.exists():raise FileNotFoundError('Public training data package missing: data/public/training_plan.json')
  base=resolve_model('BaseModel')
- plan=prepare_public_features(json.loads(plan_path.read_text()),plan_path.parent,base['config']['esm_checkpoint'])
+ plan=prepare_public_features(json.loads(plan_path.read_text()),plan_path.parent,base['config']['esm_checkpoint'],device=getattr(a,'device','cpu'))
  with fresh_output(a.output_dir) as out:
   for stage in plan['stages']:
    options=stage['options'].copy()
    for k,v in options.items():
     if isinstance(v,str) and v.startswith('DATA/'):options[k]=str(ROOT/'data/public'/v[5:])
     elif isinstance(v,str) and v.startswith('OUT/'):options[k]=str(out/v[4:])
-   options.update({'epochs':a.epochs,'learning-rate':a.learning_rate,'batch-size':a.batch_size})
+   options.update({'epochs':a.epochs,'learning-rate':a.learning_rate,'batch-size':a.batch_size,'device':getattr(a,'device','cpu')})
    if stage['module']=='src.generation.cli':options.update({'seed':a.seed,'threads':a.threads})
    cmd=[sys.executable,'-m',stage['module'],*stage.get('prefix',[])]
    for k,v in options.items():

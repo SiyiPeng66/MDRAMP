@@ -14,8 +14,6 @@ conda activate mdramp
 python main.py --help
 ```
 
-运行环境：Python 3.12，CPU。
-
 首次使用会自动从 [MDRAMP](https://huggingface.co/BillyLiang/MDRAMP) 和 [ESM3](https://huggingface.co/biohub/esm3-sm-open-v1) 下载模型。
 
 ## 快速开始
@@ -52,13 +50,14 @@ python main.py train
 | 参数 | 默认值 | 说明 |
 |---|---|---|
 | `--output-dir DIR` | `runs/` 下自动生成的时间戳目录 | 输出目录，不能已经存在。 |
+| `--device {cpu,cuda}` | `cpu` | 计算设备；CUDA 需要 NVIDIA 驱动和支持 CUDA 的 PyTorch。 |
 | `--threads N` | `2` | CPU 线程数。 |
 | `--seed N` | `11` | 随机种子；公开专家集成使用训练计划中固定的种子列表。 |
 | `--help` | — | 查看对应命令的帮助。 |
 
 ### 模型训练：`train`
 
-训练公开数据专家和自回归生成器。训练数据由 `data/public/training_plan.json` 指定，ESM3 特征自动计算。
+训练公开数据专家和自回归生成器。训练数据由 `data/public/training_plan.json` 指定，ESM3 特征自动计算。例如：
 
 ```bash
 python main.py train --epochs 100 --batch-size 32 --output-dir runs/public_training
@@ -70,12 +69,7 @@ python main.py train --epochs 100 --batch-size 32 --output-dir runs/public_train
 | `--batch-size N` | `32` | 训练批大小。 |
 | `--learning-rate X` | `0.0001` | 各阶段使用的学习率。 |
 
-**输出：** `experts/`（专家权重与标准化器）、`interaction.pt`、`generator.pt`、`scorer.json`、训练日志和清单。新模型没有 MIC 预测头，不会替换默认模型。可用以下命令初始化其 MIC 预测头：
-
-```bash
-python main.py calibrate --model runs/public_training/scorer.json --input demo/experiments.csv
-```
-
+**输出：** `experts/`（专家权重与标准化器）、`interaction.pt`、`generator.pt`、`scorer.json`、训练日志和清单。
 ### 迭代校准：`calibrate`
 
 使用实验观测更新 MIC 预测头，编码器和专家保持冻结。默认在当前注册的 FinalModel 基础上继续训练。
@@ -118,7 +112,7 @@ python main.py predict --model runs/calibration/model.pt --input demo/predict.fa
 python main.py predict --input demo/predict.fasta --details --output-dir runs/prediction
 ```
 
-**输入：** FASTA、CSV、TSV 或 XLSX（首个工作表）。表格必需 `sequence` 列，可选 `id`；FASTA 标题作为编号。仅接受 20 种标准氨基酸，自动去空白并转大写，不需要菌株信息。
+**输入：** FASTA、CSV、TSV。表格必需 `sequence` 列，可选 `id`；FASTA 标题作为编号。仅接受 20 种标准氨基酸。
 
 ```csv
 id,sequence
@@ -153,22 +147,11 @@ python main.py generate --count 100 --details --output-dir runs/candidates
 
 **输出：** `candidates.csv`（`rank`、`id`、`sequence`、`predicted_mic`，MIC 单位 μg/mL）、`candidates.fasta` 和 `run.json`。合格候选不足时，可增加 `--max-proposals`。
 
-## 模型与数据说明
-
-FinalModel 使用调整后的 MIC 标签及排名偏好拟合，输出属于模型估计，不是新增实验测量。候选生成使用预训练自回归生成器采样、过滤，再由所选模型排序，不会在每次请求时重新训练生成器。Demo 序列参与过校准，不是独立测试集。
-
-资产版本、训练输入、候选表格和复现细节见[模型与数据说明](docs/MODELS_AND_DATA-Zh.md)。上游模型与数据集保留各自许可。
-
-## 测试
+使用 NVIDIA GPU 时，先按 [PyTorch 安装说明](https://pytorch.org/get-started/locally/)在 Conda 环境中安装与驱动匹配的 CUDA 版本，再执行：
 
 ```bash
-python -m pytest -q
+python main.py predict --input demo/predict.fasta --device cuda
+python main.py calibrate --input demo/experiments.csv --device cuda
+python main.py generate --count 100 --device cuda
+python main.py train --device cuda
 ```
-
-## 研究数据
-
-完整实验数据及其候选预测表随论文补充材料提供，不纳入本仓库。仓库仅保留已选定的六条 Demo 序列用于测试。生成时可用 `--exclude FILE` 指定 FASTA 或表格文件，排除其中的已测序列。
-
-## 蛋白面板
-
-蛋白面板筛选表（6,413 → 611 → 575）见 [data/protein_panel](data/protein_panel/README.md)。

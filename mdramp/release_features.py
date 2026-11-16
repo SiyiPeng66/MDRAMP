@@ -22,7 +22,7 @@ def _data_path(root, value):
     return path
 
 
-def prepare_public_features(plan, public_root, weights_path):
+def prepare_public_features(plan, public_root, weights_path, device="cpu"):
     """Return a plan pointing at verified shipped or recomputed embeddings."""
     root = Path(public_root)
     result = copy.deepcopy(plan)
@@ -69,7 +69,7 @@ def prepare_public_features(plan, public_root, weights_path):
         runtime = build._runtime_fingerprint(weights)
         for options, key, meta_key, source, prefix in requests:
             identity = {'input_sha256': sha256_file(source), 'checkpoint_sha256': weight_hash,
-                        'model_name': 'esm3-sm-open-v1', 'device': 'cpu', 'runtime': runtime}
+                        'model_name': 'esm3-sm-open-v1', 'device': device, 'runtime': runtime}
             digest = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
             directory = root / '.feature_cache' / digest
             receipt = directory / f'{prefix}_metadata.json'
@@ -86,7 +86,7 @@ def prepare_public_features(plan, public_root, weights_path):
                 print(f'Preparing public ESM3 features: {source.name} (resumes interrupted work)', flush=True)
                 build.build_embeddings(dataset=prefix, input_csv=source, output_dir=directory,
                     id_column='record_id', sequence_column='sequence', valid_column=None,
-                    model_name='esm3-sm-open-v1', device='cpu', hf_home=root/'.hf_cache',
+                    model_name='esm3-sm-open-v1', device=device, hf_home=root/'.hf_cache',
                     weights_path=str(weights), resume=True)
             options[key] = str(directory / f'{prefix}.npz')
             options[meta_key] = str(directory / f'{prefix}_metadata.csv')

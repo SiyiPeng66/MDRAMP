@@ -14,8 +14,8 @@
       "sha256": "2a73274ad14e4929bdf7b9ffb5f1881bea94dfe522b2bfa13ed006f7bc97708e"
     },
     "README.md": {
-      "size": 8100,
-      "sha256": "caed887dec9e277b8793e44c4ee1ffdef0433a1b88ee0ad9c58d9ce7a7416ca3"
+      "size": 7546,
+      "sha256": "2f0d6275f72c70e41fbb5d22ea23e3a62ec75214f3429c9f9ee1f34dacb74a8e"
     },
     ".gitignore": {
       "size": 616,
@@ -26,8 +26,8 @@
       "sha256": "8b21c49d1680719e9f625bae9fd78b86407bb61801a8110503138015961a5e29"
     },
     "README-Zh.md": {
-      "size": 7510,
-      "sha256": "3d8dddc47167c4d0334af6b633a1f300ec513e23c0e09f586b28ad20af844126"
+      "size": 6757,
+      "sha256": "cbc72a4e6f93e1008b95fbb4e8a26c7cbe0cbec65d7acde088971f88a66652b5"
     },
     "demo/predict.fasta": {
       "size": 125,
@@ -262,8 +262,8 @@
       "sha256": "5ea276149a54c11f1f4076d78639074fc543b23b1d39cffa16411b9d1ed95567"
     },
     "tests/test_release_calibration.py": {
-      "size": 1521,
-      "sha256": "310365261bcc625b0ed08b10bc10c02642bbc63504ef4739d9b4a22d8aec0369"
+      "size": 2395,
+      "sha256": "5bf7f98a4ee8bce43dddac439b64ed969527917cf8f6fe84fc9a047375faea16"
     },
     "tests/test_panel_probes_review.py": {
       "size": 4013,
@@ -322,8 +322,8 @@
       "sha256": "bda45a88652bd6fc52d86d2f593fe7a238a10431dcca05c105d4d33ea19b7ece"
     },
     "tests/test_release_features.py": {
-      "size": 3648,
-      "sha256": "f69b5266b98656f2aaf01b39e742b5def9950ad12e70d6ccf09d492ed3bb9e73"
+      "size": 4234,
+      "sha256": "8c12a055d748025c8c541aa2812f449372401c5a00adfb2de0d5b11ecdb1d153"
     },
     "tests/test_prott5_embeddings.py": {
       "size": 2451,
@@ -362,8 +362,8 @@
       "sha256": "1bf77252104b7c6d74bf686a9ec07ed273bef1bc476d29b224cd82f11788546f"
     },
     "mdramp/release_runtime.py": {
-      "size": 2654,
-      "sha256": "ae98ee48f231ea56ae14e1fef79f124ed493c9dd9185b6feec3af8cf14a2046b"
+      "size": 2824,
+      "sha256": "edf2e892c2d1409f92e9e9d40167e9a4a45ea7534b57b24238dcad5152ac3d95"
     },
     "mdramp/panel_budget_evaluate.py": {
       "size": 9722,
@@ -406,8 +406,8 @@
       "sha256": "f14a704af448bb8cbba12ace18423ad96b6bd7cbc214e236b339c51f82fc9c06"
     },
     "mdramp/release_features.py": {
-      "size": 4684,
-      "sha256": "ece0992dda44f91cf0787803404cb28b23cc8f4cd377c617d10f393f4ba3e23e"
+      "size": 4700,
+      "sha256": "001832f6da27dea9e71d7adf2b49ea39cd6191af1e5a1238d41db78e3ee66fc5"
     },
     "mdramp/protein_library_download.py": {
       "size": 5342,
@@ -430,8 +430,8 @@
       "sha256": "d94543d72020f9dbc109477d7c58190709824781b02c1ee28c0d5aa5b36c1b13"
     },
     "mdramp/release_cli.py": {
-      "size": 5487,
-      "sha256": "d09802f76b60f529ea822169c3c09cba18c0ce8ec5adbe21d5417d6ef2eba04c"
+      "size": 6035,
+      "sha256": "ad266eb69c2ce2873dcf5839cc1e4912f365bf9b6db8ff33d960b20a0ea4492d"
     },
     "mdramp/preference_scorer.py": {
       "size": 5345,
@@ -474,8 +474,8 @@
       "sha256": "35615c25affa9f8e40451da7365f8156faaa47672d10f189e4f0865bfec4cf83"
     },
     "mdramp/release_calibration.py": {
-      "size": 8654,
-      "sha256": "414bff080cb4697f64d3d557292258afa41595ad22440107b567f91d21a301a3"
+      "size": 9105,
+      "sha256": "941d4d1be06ce9a823607150a330cdd4bc26495e0d5442b7a85c1257a1741ef1"
     },
     "mdramp/prospective_scorer.py": {
       "size": 6061,
@@ -530,8 +530,8 @@
       "sha256": "3918cd2ceec948828567ef172923127b61a0ab5655eb6c65a0407e1e5e66e6ba"
     },
     "mdramp/release_train.py": {
-      "size": 2321,
-      "sha256": "625b7f8c339e7cde05f471633f42577923ed1b19c257bbd87a635c61db911556"
+      "size": 2389,
+      "sha256": "5ba9679eed68e2c7cd50bdba309f11caaf518ad066cea48d2669f057784b97eb"
     },
     "mdramp/prospective_panelseal.py": {
       "size": 2851,
@@ -1104,6 +1104,14 @@
     "data/protein_panel/README.md": {
       "size": 1006,
       "sha256": "d8e6205e6f72fe9264cc0c9dc114ea0e60c71912382ada75a8343beac1c789fd"
+    },
+    "tests/test_release_device.py": {
+      "size": 773,
+      "sha256": "29335c7a4e8ba92e2ddad7c458145db2a28af18714813e4754defefdb3d4a698"
+    },
+    "tests/test_release_train_device.py": {
+      "size": 1358,
+      "sha256": "5a43c7dd5ba411575c6870ad51dc4f19599fd763206c745f7b8417f8c3a8477e"
     }
   }
 }

@@ -31,3 +31,23 @@ def test_base_initialization_and_censoring_are_finite_and_deterministic():
     a2,_,p2,_=train_head(x,best,None,settings())
     assert np.array_equal(p,p2)
     assert all(torch.equal(v,a2.state_dict()[k]) for k,v in a.state_dict().items())
+
+
+def test_cuda_unavailable_is_explicit(monkeypatch):
+    import pytest
+    monkeypatch.setattr(torch.cuda,'is_available',lambda: False)
+    x=np.zeros((1,1571),dtype='float32')
+    best=pd.DataFrame({'lower_log2':[1.], 'upper_log2':[1.]})
+    with pytest.raises(ValueError,match='CUDA requested'):
+        train_head(x,best,None,settings(device='cuda'))
+
+
+def test_cuda_real_training_returns_cpu_predictions():
+    import pytest
+    if not torch.cuda.is_available():
+        pytest.skip('NVIDIA CUDA hardware required')
+    x=np.random.default_rng(9).normal(size=(2,1571)).astype('float32')
+    best=pd.DataFrame({'lower_log2':[1.,4.],'upper_log2':[1.,np.inf]})
+    model,_,predictions,_=train_head(x,best,None,settings(device='cuda'))
+    assert next(model.parameters()).device.type=='cuda'
+    assert isinstance(predictions,np.ndarray) and np.isfinite(predictions).all()

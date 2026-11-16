@@ -80,3 +80,15 @@ def test_missing_checksum_manifest_is_rejected(tmp_path, monkeypatch):
     (root / 'checksums.json').unlink()
     with pytest.raises(FileNotFoundError, match='checksums missing'):
         prepare_public_features(plan, root, weights)
+
+
+def test_device_is_forwarded_and_cache_is_separated(tmp_path, monkeypatch):
+    root, source, weights, plan = fixture(tmp_path, monkeypatch)
+    calls = []
+    def build_stub(**kwargs):
+        calls.append(kwargs)
+    monkeypatch.setattr(build, 'build_embeddings', build_stub)
+    cpu = prepare_public_features(plan, root, weights)
+    cuda = prepare_public_features(plan, root, weights, device='cuda')
+    assert [call['device'] for call in calls] == ['cpu', 'cuda']
+    assert cpu['stages'][0]['options']['peptide-embeddings'] != cuda['stages'][0]['options']['peptide-embeddings']

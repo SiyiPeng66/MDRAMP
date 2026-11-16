@@ -14,7 +14,7 @@ conda activate mdramp
 python main.py --help
 ```
 
-Runtime: Python 3.12, CPU.
+Runtime: Python 3.12. CPU is the default; use `--device cuda` for an NVIDIA GPU.
 
 Models download automatically on first use from [MDRAMP](https://huggingface.co/BillyLiang/MDRAMP) and [ESM3](https://huggingface.co/biohub/esm3-sm-open-v1).
 
@@ -52,6 +52,7 @@ All commands accept the following options:
 | Option | Default | Description |
 |---|---|---|
 | `--output-dir DIR` | New timestamped directory in `runs/` | Save results; the directory must not already exist. |
+| `--device {cpu,cuda}` | `cpu` | Compute device; CUDA requires an NVIDIA driver and CUDA-enabled PyTorch. |
 | `--threads N` | `2` | CPU thread count. |
 | `--seed N` | `11` | Random seed; public expert ensembles use the fixed seeds in the training plan. |
 | `--help` | — | Show command-specific help. |
@@ -153,22 +154,11 @@ python main.py generate --count 100 --details --output-dir runs/candidates
 
 **Outputs:** `candidates.csv` (`rank`, `id`, `sequence`, `predicted_mic` in μg/mL), `candidates.fasta` and `run.json`. Increase `--max-proposals` if too few candidates pass the filters.
 
-## Model and data notes
-
-FinalModel was fitted with adjusted MIC labels and ranking preferences. Its outputs are model estimates, not new experimental measurements. Candidate generation samples the pretrained autoregressive generator, applies filters and ranks with the selected model; it does not retrain the generator per request. The demo peptides participated in calibration and are not an independent test set.
-
-See [model and data notes](docs/MODELS_AND_DATA.md) for asset versions, training inputs, candidate tables and reproducibility details. Upstream models and datasets retain their respective licenses.
-
-## Tests
+For NVIDIA GPUs, install a driver-compatible CUDA build in the Conda environment using the [PyTorch installation instructions](https://pytorch.org/get-started/locally/), then run:
 
 ```bash
-python -m pytest -q
+python main.py predict --input demo/predict.fasta --device cuda
+python main.py calibrate --input demo/experiments.csv --device cuda
+python main.py generate --count 100 --device cuda
+python main.py train --device cuda
 ```
-
-## Study data
-
-The full experimental dataset and derived candidate tables are provided in the manuscript supplementary materials, not in this repository. The six explicitly selected demo sequences are included for testing. Use `--exclude FILE` during generation to exclude sequences supplied in FASTA or tabular format.
-
-## Protein panel
-
-The protein-panel screening workbook (6,413 → 611 → 575) is available in [data/protein_panel](data/protein_panel/README.md).

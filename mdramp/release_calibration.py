@@ -24,14 +24,17 @@ def sha(path):
 def train_head(x, best, starting_model, args):
     """Fit shared weights; intervals and labels never become inference overrides."""
     torch.manual_seed(args.seed)
-    values=torch.as_tensor(x,dtype=torch.float32,device='cpu')
-    lo=torch.as_tensor(best.lower_log2.to_numpy(dtype=float,copy=True),dtype=torch.float32)
-    hi=torch.as_tensor(best.upper_log2.to_numpy(dtype=float,copy=True),dtype=torch.float32)
+    device=getattr(args,'device','cpu')
+    if device == 'cuda' and not torch.cuda.is_available():
+        raise ValueError('CUDA requested but no NVIDIA CUDA device is available')
+    values=torch.as_tensor(x,dtype=torch.float32,device=device)
+    lo=torch.as_tensor(best.lower_log2.to_numpy(dtype=float,copy=True),dtype=torch.float32,device=device)
+    hi=torch.as_tensor(best.upper_log2.to_numpy(dtype=float,copy=True),dtype=torch.float32,device=device)
     if values.ndim != 2 or values.shape != (len(best),1571) or not torch.isfinite(values).all():
         raise ValueError('Expected finite N x 1571 frozen feature matrix')
     if torch.isnan(lo).any() or torch.isnan(hi).any() or (lo>hi).any():
         raise ValueError('Invalid MIC intervals')
-    model=copy.deepcopy(starting_model).cpu() if starting_model is not None else CalibrationMLP(1571,16)
+    model=(copy.deepcopy(starting_model) if starting_model is not None else CalibrationMLP(1571,16)).to(device)
     model.requires_grad_(True)
     if starting_model is None:
         with torch.no_grad():
@@ -39,13 +42,14 @@ def train_head(x, best, starting_model, args):
             model.layers[-1].bias.fill_(float(torch.median(lo)))
     model.eval()
     with torch.no_grad():
-        before=model(values).squeeze(-1).numpy().copy() if starting_model is not None else None
+        before=model(values).squeeze(-1).cpu().numpy().copy() if starting_model is not None else None
     optimizer=torch.optim.AdamW(model.parameters(),lr=args.learning_rate,weight_decay=1e-4)
     generator=torch.Generator().manual_seed(args.seed)
     history=[]
     for epoch in range(args.epochs):
         model.train()
         for batch in torch.randperm(len(values),generator=generator).split(args.batch_size):
+            batch=batch.to(device)
             optimizer.zero_grad()
             loss=interval_huber(model(values[batch]).squeeze(-1),lo[batch],hi[batch])
             if not torch.isfinite(loss):raise ValueError('Nonfinite calibration loss')
@@ -53,7 +57,7 @@ def train_head(x, best, starting_model, args):
         model.eval()
         with torch.no_grad():loss=float(interval_huber(model(values).squeeze(-1),lo,hi))
         history.append({'epoch':epoch+1,'interval_huber':loss})
-    with torch.no_grad():after=model(values).squeeze(-1).numpy()
+    with torch.no_grad():after=model(values).squeeze(-1).cpu().numpy()
     if not np.isfinite(after).all():raise ValueError('Nonfinite calibrated predictions')
     return model,before,after,history
 
@@ -74,6 +78,7 @@ def run(args):
     best=aggregate_best(observations,divisor=args.mic_divisor)
     source_hash=sha(args.input)
     bundle=resolve_model(args.model)
+    bundle['config']['device']=getattr(args,'device','cpu')
     runtime=load_runtime(bundle)
     x,evidence=runtime.extract(best.sequence.tolist())
     if 'sequence' in evidence and evidence.sequence.tolist()!=best.sequence.tolist():
@@ -82,6 +87,7 @@ def run(args):
     parent_path=bundle.get('checkpoint')
     parent_hash=sha(parent_path) if parent_path else sha(bundle['scorer_config'])
     settings={k:getattr(args,k) for k in ('epochs','learning_rate','batch_size','threads','seed','mic_divisor')}
+    settings['device']=getattr(args,'device','cpu')
     identity=json.dumps({'parent':parent_hash,'input':source_hash,'settings':settings},sort_keys=True)
     state_id='calibrated_'+hashlib.sha256(identity.encode()).hexdigest()[:16]
     model,before,after,history=train_head(x,best,runtime.model,args)
@@ -105,10 +111,10 @@ def run(args):
         best.to_csv(out/'training_targets.csv',index=False)
         shutil.copy2(args.input,out/('experiments_original'+Path(args.input).suffix.lower()))
         torch.save(metadata,out/'model.pt')
-        restored=CalibrationMLP(1571,16)
+        restored=CalibrationMLP(1571,16).to(getattr(args,'device','cpu'))
         restored.load_state_dict(torch.load(out/'model.pt',map_location='cpu',weights_only=True)['state_dict'])
         restored.eval()
-        with torch.no_grad():reloaded=restored(torch.as_tensor(x,dtype=torch.float32)).squeeze(-1).numpy()
+        with torch.no_grad():reloaded=restored(torch.as_tensor(x,dtype=torch.float32,device=getattr(args,'device','cpu'))).squeeze(-1).cpu().numpy()
         if not np.array_equal(after,reloaded):raise ValueError('Saved model predictions differ after reload')
         result=best[['id','sequence']].copy()
         result['before_mic']=np.exp2(before.astype(float)) if before is not None else np.nan
