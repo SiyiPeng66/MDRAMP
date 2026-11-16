@@ -14,8 +14,8 @@
       "sha256": "2a73274ad14e4929bdf7b9ffb5f1881bea94dfe522b2bfa13ed006f7bc97708e"
     },
     "README.md": {
-      "size": 8670,
-      "sha256": "20aae08b8ee1fa627c73b83975d437873e412fe62b2e6731d761e800cd02ef58"
+      "size": 8667,
+      "sha256": "d9daf542c07792d9212d0dab42dd20cbc6a428365c89c4141e43f234044ffaa3"
     },
     ".gitignore": {
       "size": 504,
@@ -26,36 +26,36 @@
       "sha256": "8b21c49d1680719e9f625bae9fd78b86407bb61801a8110503138015961a5e29"
     },
     "README-Zh.md": {
-      "size": 7994,
-      "sha256": "1aedb70d1d1443ae651a98c8327f8db61bb9682154a3b2791b53990fc1d42937"
+      "size": 7991,
+      "sha256": "940496c925e95c85dc6976a8fedba7a3113b958b92688c98626366f60e93e44a"
     },
     "demo/predict.fasta": {
-      "size": 71,
-      "sha256": "2a546d7f883cf1b9acde4ab7be58b527c0d2888182edcab53e03572c770ec79e"
+      "size": 125,
+      "sha256": "a651e75f123597ce96e3b8166e51309ce11d0d70bdf2db15b733fdda729d974d"
     },
     "demo/predict.tsv": {
-      "size": 80,
-      "sha256": "c9b595ed8e792d15674a811c864021417ec3dfafbcf8645183c5c5db46795149"
+      "size": 131,
+      "sha256": "406cc21ad454e30cffdacd26050b0dcf5af82ca9d0240bf947134d945ce8a9d2"
     },
     "demo/provenance.json": {
-      "size": 2981,
-      "sha256": "c1dacb4674c9ad895988a005746258c528ef63bad9e5e0929f44fc31a6d3573e"
+      "size": 3429,
+      "sha256": "2849942e8d9a3c25bb78d195a73b9daec874f86c444cc01c51177bbc2601ef44"
     },
     "demo/experiments.csv": {
-      "size": 669,
-      "sha256": "cc13ae461b5260d5668ed0a16a264e461c87b58d9ab52bc585e5eadb07ef79bb"
+      "size": 615,
+      "sha256": "5550042985bffdc5df525f74bc203583d6dffd3bbb3b23534d5a857dd22d366c"
     },
     "demo/README.md": {
-      "size": 1172,
-      "sha256": "e09863dba5c19a91eba5aefce9a468b95ff2c922317ba5cb511513a2ad881477"
+      "size": 1424,
+      "sha256": "9a7de9e9e988a73a8ceb175eca28c47822abf9e36a9e031d921533877c6c289c"
     },
     "demo/expected_predictions.csv": {
-      "size": 151,
-      "sha256": "c69285d3cf1ccb2eef6243cdc18351a13f9fd9656653eba5cf1f561f53f4e28d"
+      "size": 258,
+      "sha256": "489e78ba1692de9d67905f01b3d0c049deea3dd9f617abb82968e2c174daffda"
     },
     "demo/predict.csv": {
-      "size": 80,
-      "sha256": "b3645c9ba54f2790a99202a6eeb3595075cc3b6743da7a354886b2efedd8ee8e"
+      "size": 131,
+      "sha256": "e43b39d86e7550832f0b0d5df9f7fdd778d73338d87401c73384e7b0198719fa"
     },
     "tests/test_generator_resume.py": {
       "size": 4392,
@@ -988,6 +988,10 @@
     "configs/assets/downloads.json": {
       "size": 5984,
       "sha256": "5703f935a5299a8308f34a06377fcfd98e74cd012e68086cb05f46da78a03dd3"
+    },
+    "demo/expected_classes.csv": {
+      "size": 235,
+      "sha256": "cdb34218922fe8f8cfce14ec11e3e1f2686f4dd7d7a83979a904ebe2cb3dcc66"
     }
   }
 }

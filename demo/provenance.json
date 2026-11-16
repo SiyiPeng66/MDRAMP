@@ -3,109 +3,109 @@
   "mic_divided": false,
   "observation_sources": [
     {
-      "id": "AMP-DN01",
+      "id": "Test1",
       "strain": "Ab_WT",
       "source": "reported_quantitative_MIC",
       "mic": 8.0
     },
     {
-      "id": "AMP-DN01",
+      "id": "Test1",
       "strain": "Sa_WT",
       "source": "reported_quantitative_MIC",
       "mic": 4.0
     },
     {
-      "id": "AMP-DN01",
+      "id": "Test1",
       "strain": "CRAB",
       "source": "reported_quantitative_MIC",
       "mic": 16.0
     },
     {
-      "id": "AMP-DN01",
+      "id": "Test1",
       "strain": "MRSA",
       "source": "reported_quantitative_MIC",
       "mic": 4.0
     },
     {
-      "id": "AMP-DN01",
+      "id": "Test1",
       "strain": "CRKP",
       "source": "user_assigned_lowest_positive_tested_dose",
       "mic": 256.0
     },
     {
-      "id": "AMP-DN01",
+      "id": "Test1",
       "strain": "CRPA",
       "source": "reported_quantitative_MIC",
       "mic": 16.0
     },
     {
-      "id": "AMP-DN05",
+      "id": "Test2",
       "strain": "Ab_WT",
       "source": "reported_quantitative_MIC",
       "mic": 2.0
     },
     {
-      "id": "AMP-DN05",
+      "id": "Test2",
       "strain": "Sa_WT",
       "source": "reported_quantitative_MIC",
       "mic": 32.0
     },
     {
-      "id": "AMP-DN05",
+      "id": "Test2",
       "strain": "CRAB",
       "source": "reported_quantitative_MIC",
       "mic": 2.0
     },
     {
-      "id": "AMP-DN05",
+      "id": "Test2",
       "strain": "MRSA",
       "source": "user_adjudicated_quantitative_MIC",
       "mic": 32.0
     },
     {
-      "id": "AMP-DN05",
+      "id": "Test2",
       "strain": "CRKP",
       "source": "user_assigned_lowest_positive_tested_dose",
       "mic": 256.0
     },
     {
-      "id": "AMP-DN05",
+      "id": "Test2",
       "strain": "CRPA",
       "source": "reported_quantitative_MIC",
       "mic": 64.0
     },
     {
-      "id": "AMP-LO18",
+      "id": "Test3",
       "strain": "Ab_WT",
       "source": "reported_quantitative_MIC",
       "mic": 2.0
     },
     {
-      "id": "AMP-LO18",
+      "id": "Test3",
       "strain": "Sa_WT",
       "source": "reported_quantitative_MIC",
       "mic": 2.0
     },
     {
-      "id": "AMP-LO18",
+      "id": "Test3",
       "strain": "CRAB",
       "source": "reported_quantitative_MIC",
       "mic": 2.0
     },
     {
-      "id": "AMP-LO18",
+      "id": "Test3",
       "strain": "MRSA",
       "source": "reported_quantitative_MIC",
       "mic": 4.0
     },
     {
-      "id": "AMP-LO18",
+      "id": "Test3",
       "strain": "CRKP",
       "source": "reported_quantitative_MIC",
       "mic": 64.0
     },
     {
-      "id": "AMP-LO18",
+      "id": "Test3",
       "strain": "CRPA",
       "source": "reported_quantitative_MIC",
       "mic": 8.0
@@ -120,5 +120,22 @@
     "repo_id": "BillyLiang/MDRAMP",
     "revision": "e37dd0fe409a2dc2364eba45b1257d37fca95c89",
     "sha256": "d6223b35b29dbbcfebd61117741570eaa3e96eda19db4bdab39050ff22a0a963"
-  }
+  },
+  "negative_demo": [
+    {
+      "id": "Test4",
+      "sequence": "CYFFTTWLLKLLR",
+      "evidence": "all six tested strains MIC >256 ug/mL; experimental training negative"
+    },
+    {
+      "id": "Test5",
+      "sequence": "AHKFTKFATRRRR",
+      "evidence": "all six tested strains MIC >256 ug/mL; experimental training negative"
+    },
+    {
+      "id": "Test6",
+      "sequence": "KAGLRVPARRRRR",
+      "evidence": "all six tested strains MIC >256 ug/mL; experimental training negative"
+    }
+  ]
 }
