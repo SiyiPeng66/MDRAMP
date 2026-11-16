@@ -115,5 +115,10 @@
     "outputs/calibration_screen_assigned_best_v1/strain_observations.csv": "31c8ad9b607f9a1af99ea5243804535b4174962a4ba392bf0731aa9a63280b6c",
     "outputs/prospective_575_v1/features/expert_means.csv": "7f90dc57b5c6f2d36b8d61f394a89b63182a5ac3b7fa991b9bce5dec0cd5526c",
     "outputs/preference_head_v1/trained_rank/model.pt": "a35114b035172d8032f58f86c563e3cf2b8544e83f33d9c84f4c2d67bd50af73"
+  },
+  "prediction_model": {
+    "repo_id": "BillyLiang/MDRAMP",
+    "revision": "e37dd0fe409a2dc2364eba45b1257d37fca95c89",
+    "sha256": "d6223b35b29dbbcfebd61117741570eaa3e96eda19db4bdab39050ff22a0a963"
   }
 }

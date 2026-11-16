@@ -1,7 +1,7 @@
 {
   "models": {
     "repo_id": "BillyLiang/MDRAMP",
-    "revision": "dd0262d8ca7b7e1de3679f8bf1c473a6da67922f",
+    "revision": "e37dd0fe409a2dc2364eba45b1257d37fca95c89",
     "files": {
       "models.json": {
         "size": 107,
@@ -36,8 +36,8 @@
         "sha256": "bdda5afdd8b73d33a7d753beed69720907d7083fa7814b37dd795b53264f73de"
       },
       "FinalModel/model.pt": {
-        "size": 143369,
-        "sha256": "a35114b035172d8032f58f86c563e3cf2b8544e83f33d9c84f4c2d67bd50af73"
+        "size": 143433,
+        "sha256": "d6223b35b29dbbcfebd61117741570eaa3e96eda19db4bdab39050ff22a0a963"
       },
       "FinalModel/scorer.json": {
         "size": 545,
@@ -47,9 +47,13 @@
         "size": 12813831,
         "sha256": "658c8139aee8034aac097b8be72c0717d3aba8ed487a008b5cbda9d17524e196"
       },
+      "FinalModel/validation.json": {
+        "size": 850,
+        "sha256": "87d882f7699963602f6968e6c377e08b6a2c9cd9a7d850e68ef43fe72637930b"
+      },
       "FinalModel/manifest.json": {
-        "size": 485,
-        "sha256": "6a05261a2c825fbbc5bc7d152e5e241e3434aee92b02b49d8739334789798e8b"
+        "size": 2623,
+        "sha256": "ad7f535ca2943765772f4972b8c70b714040e75f9d1c1a4f2db2c45cc26b8483"
       },
       "BaseModel/scorer.json": {
         "size": 473,

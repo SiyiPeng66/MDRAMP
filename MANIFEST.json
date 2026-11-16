@@ -14,8 +14,8 @@
       "sha256": "2a73274ad14e4929bdf7b9ffb5f1881bea94dfe522b2bfa13ed006f7bc97708e"
     },
     "README.md": {
-      "size": 8204,
-      "sha256": "3d77d14e9e492b6ee192e1c563dc97a34ca73c853cf92b2933e628dae346cefd"
+      "size": 8670,
+      "sha256": "20aae08b8ee1fa627c73b83975d437873e412fe62b2e6731d761e800cd02ef58"
     },
     ".gitignore": {
       "size": 504,
@@ -26,8 +26,8 @@
       "sha256": "8b21c49d1680719e9f625bae9fd78b86407bb61801a8110503138015961a5e29"
     },
     "README-Zh.md": {
-      "size": 7604,
-      "sha256": "611e50aa7137ffe6877a71436e60c71e14ef41ef752516121d7c81cd24c184ec"
+      "size": 7994,
+      "sha256": "1aedb70d1d1443ae651a98c8327f8db61bb9682154a3b2791b53990fc1d42937"
     },
     "demo/predict.fasta": {
       "size": 71,
@@ -38,8 +38,8 @@
       "sha256": "c9b595ed8e792d15674a811c864021417ec3dfafbcf8645183c5c5db46795149"
     },
     "demo/provenance.json": {
-      "size": 2774,
-      "sha256": "d30e724821570752b01c55f6d63a9fe02a23c551c030a73a2c87bfe2ef1bcaa5"
+      "size": 2981,
+      "sha256": "c1dacb4674c9ad895988a005746258c528ef63bad9e5e0929f44fc31a6d3573e"
     },
     "demo/experiments.csv": {
       "size": 669,
@@ -50,8 +50,8 @@
       "sha256": "e09863dba5c19a91eba5aefce9a468b95ff2c922317ba5cb511513a2ad881477"
     },
     "demo/expected_predictions.csv": {
-      "size": 150,
-      "sha256": "43327e59d52fb7f89a8af13dd22b29e2ede2d976a975b1b29bc188fd02c0de64"
+      "size": 151,
+      "sha256": "c69285d3cf1ccb2eef6243cdc18351a13f9fd9656653eba5cf1f561f53f4e28d"
     },
     "demo/predict.csv": {
       "size": 80,
@@ -334,16 +334,16 @@
       "sha256": "efdc86629ed5e9bd6be8c62b3845d6956c6c48deed8dc6edcf5177274ce0e98c"
     },
     "docs/MODELS_AND_DATA.md": {
-      "size": 3971,
-      "sha256": "dda7f2c57203d1b876b93aa783c7e55527bac8886ed3ecb9250e86ad0be2de5b"
+      "size": 4437,
+      "sha256": "00bfb1421288a0b63deb25fa1b84178c3ecd2daacd36dc1228d632cc5fc69cd9"
     },
     "docs/MODELS_AND_DATA-Zh.md": {
-      "size": 3197,
-      "sha256": "1b5b8c54c987b621f691357799cec762a77ec89f34dbcb44c78716772b99a961"
+      "size": 3587,
+      "sha256": "67d90078afc6afaa833cabbc0d71958474e84d68c4f0cb7199dcf405d7a7057e"
     },
     "deliverables/R0-R5_Candidates.xlsx": {
-      "size": 45654,
-      "sha256": "39ec4e6d850d960ac04dfa3cf96608b4e4e1d352f2b29179e2f4c70f7b09a82b"
+      "size": 45828,
+      "sha256": "cdb2cfd191d95a81acc7fd01ae49eeef9e74190913c0cb23a402f9ab395c22d5"
     },
     "mdramp/preference_features.py": {
       "size": 4613,
@@ -388,6 +388,10 @@
     "mdramp/prospective_experts.py": {
       "size": 5172,
       "sha256": "427d62d2e5c507e7fe46b9d0382333db2608f7738b69a110b9b44280634316f1"
+    },
+    "mdramp/negative_revision.py": {
+      "size": 4083,
+      "sha256": "f14a704af448bb8cbba12ace18423ad96b6bd7cbc214e236b339c51f82fc9c06"
     },
     "mdramp/release_features.py": {
       "size": 4684,
@@ -898,20 +902,20 @@
       "sha256": "79cf5a4b74dc7108b88afc372290942719eda7be88ebb92222d926294066ac72"
     },
     "data/release/original230_predictions.csv": {
-      "size": 55921,
-      "sha256": "dfff7f0b013d58f17e62efacca7f616f43792c0b5d8c6ff51e52f6fc56ea6349"
+      "size": 52419,
+      "sha256": "fd85bb636a299a9709f492a177bf351b1934f7c6d78aec5ac527f57bbeafacb6"
     },
     "data/release/source_rows.csv": {
       "size": 107374,
       "sha256": "004585779b804377975f5530dd2a34d1ea1d5d7883d1e631f7cd9fc22d42b583"
     },
     "data/release/checksums.json": {
-      "size": 568,
-      "sha256": "1fb28a8d18f67b918bd5cb17dbf7ce0c8906db74529810b7af66d2eea542b2ce"
+      "size": 569,
+      "sha256": "d4a8d5fd5db9e254dffb591ab40d9f5859c0b391008dbf4a5c91a3f00cf80d67"
     },
     "data/release/candidates600.csv": {
-      "size": 380938,
-      "sha256": "3617c781d857813bdc0d90ffefc1e144b7e0860f1d8fe5775acedd98fd1122fe"
+      "size": 378587,
+      "sha256": "cbbaf5fd829f7fa1b6e1211d512012dbea74b5363fc59ee64524f6abac78792d"
     },
     "data/public/training_plan.json": {
       "size": 3054,
@@ -982,8 +986,8 @@
       "sha256": "e8a48c4e9f26959d48b79d2929c670dfb895a3aae5e7679a557042e7667e9c02"
     },
     "configs/assets/downloads.json": {
-      "size": 5830,
-      "sha256": "91511bebd8d8ccc3cf6ab3f655d4e215f7b10edcc6e6d6898a426e61f49a3ac2"
+      "size": 5984,
+      "sha256": "5703f935a5299a8308f34a06377fcfd98e74cd012e68086cb05f46da78a03dd3"
     }
   }
 }

@@ -33,3 +33,5 @@ The runtime dependency versions are pinned in `configs/requirements-runtime.lock
 Runtime checks cover demo prediction, small calibration and generation, feature reconstruction, and unit tests on macOS ARM64. This does not constitute full historical round reproduction or independent biological validation. Linux has not been independently exercised; native Windows is unsupported (use WSL2).
 
 Upstream model and data licenses apply separately. The Hugging Face model card describes model-asset licensing; it does not automatically grant a license to all source datasets or this source repository.
+
+FinalModel includes negative constraints: 27 R0–R2 experimental negatives and 57 public training negatives all predict MIC >256 μg/mL. The 203 retained original sequences changed by at most 1.05%; designated ranks remain 1, 5 and 8. Only 7 of 12 public held-out sequences exceeded 256. These sequences had prior AMP-pretraining exposure and some primary-source evidence remains pending; this is an internal MIC-head holdout, not independent external validation.

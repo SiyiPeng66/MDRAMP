@@ -164,3 +164,5 @@ See [model and data notes](docs/MODELS_AND_DATA.md) for asset versions, training
 ```bash
 python -m pytest -q
 ```
+
+FinalModel includes negative constraints: 27 R0–R2 experimental negatives and 57 public training negatives all predict MIC >256 μg/mL. The 203 retained original sequences changed by at most 1.05%; designated ranks remain 1, 5 and 8. Only 7 of 12 public held-out sequences exceeded 256. These sequences had prior AMP-pretraining exposure and some primary-source evidence remains pending; this is an internal MIC-head holdout, not independent external validation.
