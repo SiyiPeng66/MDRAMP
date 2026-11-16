@@ -14,9 +14,9 @@ conda activate mdramp
 python main.py --help
 ```
 
-默认使用 CPU 和 Python 3.12。已在 macOS 验证；代码支持 Linux，但尚未独立实机验证。Windows 请使用 WSL2。
+运行环境：Python 3.12，CPU。
 
-首次使用会自动从 [MDRAMP](https://huggingface.co/BillyLiang/MDRAMP) 和 [ESM3](https://huggingface.co/biohub/esm3-sm-open-v1) 下载模型。全部资产约占 5.75 GiB，后续复用本地文件，文件齐全后可离线运行。
+首次使用会自动从 [MDRAMP](https://huggingface.co/BillyLiang/MDRAMP) 和 [ESM3](https://huggingface.co/biohub/esm3-sm-open-v1) 下载模型。
 
 ## 快速开始
 
@@ -34,7 +34,7 @@ python main.py generate --count 100
 python main.py train
 ```
 
-结果保存到 `runs/` 下的新目录。通过 `--output-dir DIR` 指定输出位置，使用 `--help` 查看命令选项。公开数据训练会自动计算缺失的序列特征；CPU 全量编码和训练耗时较长。
+结果保存到 `runs/` 下的新目录。通过 `--output-dir DIR` 指定输出位置，使用 `--help` 查看命令选项。
 
 ## 模型
 
@@ -58,7 +58,7 @@ python main.py train
 
 ### 模型训练：`train`
 
-训练公开数据专家和自回归生成器。输入由 `data/public/training_plan.json` 指定，不接受 `--input` 或 `--model`。缺失的 ESM3 特征自动计算并缓存，教师评分使用已记录的训练输入。
+训练公开数据专家和自回归生成器。训练数据由 `data/public/training_plan.json` 指定，ESM3 特征自动计算。
 
 ```bash
 python main.py train --epochs 100 --batch-size 32 --output-dir runs/public_training
@@ -135,7 +135,7 @@ Test1,FLRRLVKWLKKM
 
 ### 候选生成：`generate`
 
-从预训练生成器采样，经筛选、去重并精确排除已测序列后，按所选模型的综合评分 `R_t` 排序（不是仅按 MIC 排序）。无需输入文件。
+从预训练生成器采样，经筛选、去重并精确排除已测序列后，按所选模型的综合评分 `R_t` 排序。无需输入文件。
 
 ```bash
 python main.py generate --count 100 --details --output-dir runs/candidates
@@ -151,7 +151,7 @@ python main.py generate --count 100 --details --output-dir runs/candidates
 | `--top-p X` | `0.95` | 核采样累计概率，`0 < X ≤ 1`。 |
 | `--details` | 关闭 | 额外将专家分数和 `R_t` 写入 `details.csv`。 |
 
-**输出：** `candidates.csv`（`rank`、`id`、`sequence`、`predicted_mic`，MIC 单位 μg/mL）、`candidates.fasta` 和 `run.json`。若合格序列不足 `count`，命令报错，可增加 `--max-proposals`；若已达到 `count`，即使未达到候选池目标，也可正常返回。
+**输出：** `candidates.csv`（`rank`、`id`、`sequence`、`predicted_mic`，MIC 单位 μg/mL）、`candidates.fasta` 和 `run.json`。合格候选不足时，可增加 `--max-proposals`。
 
 ## 模型与数据说明
 
@@ -164,5 +164,3 @@ FinalModel 使用调整后的 MIC 标签及排名偏好拟合，输出属于模�
 ```bash
 python -m pytest -q
 ```
-
-FinalModel 已加入阴性约束：27 条 R0–R2 实验阴性和 57 条公开训练阴性均预测 MIC＞256 μg/mL；其余 203 条原始序列最大变化约 1.05%，指定排名保持 1、5、8。公开留出样本仅 7/12 条超过 256。这些序列曾参与 AMP 预训练，部分原文证据仍待核验，因此属于内部 MIC 预测头留出评估，不是独立外部验证。

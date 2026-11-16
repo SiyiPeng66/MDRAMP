@@ -14,9 +14,9 @@ conda activate mdramp
 python main.py --help
 ```
 
-The default workflow uses CPU and Python 3.12. Tested on macOS; Linux is supported but has not been independently tested. On Windows, use WSL2.
+Runtime: Python 3.12, CPU.
 
-Models download automatically on first use from [MDRAMP](https://huggingface.co/BillyLiang/MDRAMP) and [ESM3](https://huggingface.co/biohub/esm3-sm-open-v1). The complete assets occupy approximately 5.75 GiB. Subsequent runs reuse local files and can work offline.
+Models download automatically on first use from [MDRAMP](https://huggingface.co/BillyLiang/MDRAMP) and [ESM3](https://huggingface.co/biohub/esm3-sm-open-v1).
 
 ## Quick start
 
@@ -34,7 +34,7 @@ python main.py generate --count 100
 python main.py train
 ```
 
-Outputs are saved to a new directory under `runs/`. Use `--output-dir DIR` to choose a destination and `--help` for command options. Public training automatically computes missing sequence features; full CPU encoding and training can take substantial time.
+Outputs are saved to a new directory under `runs/`. Use `--output-dir DIR` to choose a destination and `--help` for command options.
 
 ## Models
 
@@ -58,7 +58,7 @@ All commands accept the following options:
 
 ### Training: `train`
 
-Train public-data experts and the autoregressive generator. Inputs are supplied by `data/public/training_plan.json`; this command does not accept `--input` or `--model`. Missing ESM3 features are computed and cached automatically. Recorded teacher scores are used as training inputs.
+Train public-data experts and the autoregressive generator. Training data are specified in `data/public/training_plan.json`. ESM3 features are computed automatically.
 
 ```bash
 python main.py train --epochs 100 --batch-size 32 --output-dir runs/public_training
@@ -135,7 +135,7 @@ Test1,FLRRLVKWLKKM
 
 ### Candidate generation: `generate`
 
-Sample the pretrained generator, filter and deduplicate sequences, exclude previously tested exact sequences, then rank candidates by the selected model's composite score `R_t` (not by MIC alone). No input file is required.
+Sample the pretrained generator, filter and deduplicate sequences, exclude previously tested exact sequences, then rank candidates by the selected model's composite score `R_t`. No input file is required.
 
 ```bash
 python main.py generate --count 100 --details --output-dir runs/candidates
@@ -151,7 +151,7 @@ python main.py generate --count 100 --details --output-dir runs/candidates
 | `--top-p X` | `0.95` | Nucleus sampling probability, `0 < X ≤ 1`. |
 | `--details` | Off | Also save expert scores and `R_t` in `details.csv`. |
 
-**Outputs:** `candidates.csv` (`rank`, `id`, `sequence`, `predicted_mic` in μg/mL), `candidates.fasta` and `run.json`. If fewer than `count` candidates pass filters, the command fails; increase `--max-proposals`. If at least `count` pass, it can return results even when the target pool size is not reached.
+**Outputs:** `candidates.csv` (`rank`, `id`, `sequence`, `predicted_mic` in μg/mL), `candidates.fasta` and `run.json`. Increase `--max-proposals` if too few candidates pass the filters.
 
 ## Model and data notes
 
@@ -164,5 +164,3 @@ See [model and data notes](docs/MODELS_AND_DATA.md) for asset versions, training
 ```bash
 python -m pytest -q
 ```
-
-FinalModel includes negative constraints: 27 R0–R2 experimental negatives and 57 public training negatives all predict MIC >256 μg/mL. The 203 retained original sequences changed by at most 1.05%; designated ranks remain 1, 5 and 8. Only 7 of 12 public held-out sequences exceeded 256. These sequences had prior AMP-pretraining exposure and some primary-source evidence remains pending; this is an internal MIC-head holdout, not independent external validation.
