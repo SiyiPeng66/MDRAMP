@@ -168,3 +168,7 @@ python -m pytest -q
 ## Study data
 
 The full experimental dataset and derived candidate tables are provided in the manuscript supplementary materials, not in this repository. The six explicitly selected demo sequences are included for testing. Use `--exclude FILE` during generation to exclude sequences supplied in FASTA or tabular format.
+
+## Protein panel
+
+The protein-panel screening workbook (6,413 → 611 → 575) is available in [data/protein_panel](data/protein_panel/README.md).

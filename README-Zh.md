@@ -168,3 +168,7 @@ python -m pytest -q
 ## 研究数据
 
 完整实验数据及其候选预测表随论文补充材料提供，不纳入本仓库。仓库仅保留已选定的六条 Demo 序列用于测试。生成时可用 `--exclude FILE` 指定 FASTA 或表格文件，排除其中的已测序列。
+
+## 蛋白面板
+
+蛋白面板筛选表（6,413 → 611 → 575）见 [data/protein_panel](data/protein_panel/README.md)。

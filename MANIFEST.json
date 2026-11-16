@@ -14,8 +14,8 @@
       "sha256": "2a73274ad14e4929bdf7b9ffb5f1881bea94dfe522b2bfa13ed006f7bc97708e"
     },
     "README.md": {
-      "size": 7952,
-      "sha256": "3323dc7f2adb91033766d66e971bc973236102fe361e352cdf103a828b255d02"
+      "size": 8100,
+      "sha256": "caed887dec9e277b8793e44c4ee1ffdef0433a1b88ee0ad9c58d9ce7a7416ca3"
     },
     ".gitignore": {
       "size": 616,
@@ -26,8 +26,8 @@
       "sha256": "8b21c49d1680719e9f625bae9fd78b86407bb61801a8110503138015961a5e29"
     },
     "README-Zh.md": {
-      "size": 7386,
-      "sha256": "5e90837f326278414797550962e323f3404d36b20ca8854f467a577f480fac9c"
+      "size": 7510,
+      "sha256": "3d8dddc47167c4d0334af6b633a1f300ec513e23c0e09f586b28ad20af844126"
     },
     "demo/predict.fasta": {
       "size": 125,
@@ -1096,6 +1096,14 @@
     ".pytest_cache/v/cache/lastfailed": {
       "size": 69,
       "sha256": "823360d488bc88dfb9e52e386a57f3d097d57122f7f62ff7f1a915d4823a1501"
+    },
+    "data/protein_panel/Supplementary_Protein_Panel_Selection.xlsx": {
+      "size": 2461250,
+      "sha256": "921055d6144f0385e1648355b2a19d34f80d23fbc0176b3a61b14e02fa090cbc"
+    },
+    "data/protein_panel/README.md": {
+      "size": 1006,
+      "sha256": "d8e6205e6f72fe9264cc0c9dc114ea0e60c71912382ada75a8343beac1c789fd"
     }
   }
 }
