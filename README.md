@@ -132,7 +132,7 @@ Test1,FLRRLVKWLKKM
 | `--model MODEL` | `FinalModel` | Registered model or calibrated checkpoint/configuration path. |
 | `--details` | Off | Also save expert scores in `details.csv`. |
 
-**Outputs:** `predictions.csv` with `id`, `sequence`, `predicted_mic` (μg/mL), and `run.json` with parameters and asset hashes. Example inputs and reference outputs are in [`demo/`](demo/README.md).
+**Outputs:** `predictions.csv` with `id`, `sequence`, `predicted_mic` (μg/mL), and `run.json` with parameters and asset hashes. Example inputs are in [`demo/`](demo/).
 
 ### Candidate generation: `generate`
 

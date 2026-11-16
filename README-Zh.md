@@ -125,7 +125,7 @@ Test1,FLRRLVKWLKKM
 | `--model MODEL` | `FinalModel` | 注册模型名或校准权重/配置路径。 |
 | `--details` | 关闭 | 额外将专家分数写入 `details.csv`。 |
 
-**输出：** `predictions.csv`，包含 `id`、`sequence`、`predicted_mic`（μg/mL）；`run.json` 记录参数和资产哈希。输入示例及参考预测见 [`demo/`](demo/README.md)。
+**输出：** `predictions.csv`，包含 `id`、`sequence`、`predicted_mic`（μg/mL）；`run.json` 记录参数和资产哈希。输入示例见 [`demo/`](demo/)。
 
 ### 候选生成：`generate`
 

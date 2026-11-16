@@ -18,7 +18,7 @@ Missing features are computed into `data/public/.feature_cache/`. Interrupted en
 
 Calibration aggregates observations to the best peptide-level MIC interval across strains; strain is not an inference input. Right-censored values such as `>128` retain their bounds. The default target divisor is 10, configurable with `--mic-divisor`. Incompatible duplicate observations are rejected. Table headers are case-sensitive; sequence whitespace is removed and letters are uppercased.
 
-FinalModel was trained with adjusted labels and explicit ranking preferences. Those preferences were fitted within fixed candidate sets; ranks depend on the set being scored. Model outputs do not establish independent predictive accuracy. Demo peptides were part of calibration. Per-observation attribution is retained in `demo/provenance.json` and explained in `demo/README.md`.
+FinalModel was trained with adjusted labels and explicit ranking preferences. Those preferences were fitted within fixed candidate sets; ranks depend on the set being scored. Model outputs do not establish independent predictive accuracy. Demo peptides were part of calibration. The calibration demo contains original-scale observations; two screening concentrations were assigned MIC labels and one value was adjudicated.
 
 Generation samples the pretrained autoregressive policy, applies physicochemical filters, optionally excludes sequences supplied with `--exclude` and reranks using the selected MIC model. It is not a new reinforcement-learning run per request or experimental safety validation.
 

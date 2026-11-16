@@ -14,8 +14,8 @@
       "sha256": "2a73274ad14e4929bdf7b9ffb5f1881bea94dfe522b2bfa13ed006f7bc97708e"
     },
     "README.md": {
-      "size": 7546,
-      "sha256": "2f0d6275f72c70e41fbb5d22ea23e3a62ec75214f3429c9f9ee1f34dacb74a8e"
+      "size": 7515,
+      "sha256": "8d91ac20fafdbbab88b8c6ac7cbae729cdba80b9f3e11d9d0493cddfe58c2bb2"
     },
     ".gitignore": {
       "size": 616,
@@ -26,36 +26,16 @@
       "sha256": "8b21c49d1680719e9f625bae9fd78b86407bb61801a8110503138015961a5e29"
     },
     "README-Zh.md": {
-      "size": 6757,
-      "sha256": "cbc72a4e6f93e1008b95fbb4e8a26c7cbe0cbec65d7acde088971f88a66652b5"
+      "size": 6733,
+      "sha256": "ec65e69036d42b67dc948d973cbc4c5f50c8fd9aa973fea43fa1705157914903"
     },
     "demo/predict.fasta": {
       "size": 125,
       "sha256": "a651e75f123597ce96e3b8166e51309ce11d0d70bdf2db15b733fdda729d974d"
     },
-    "demo/predict.tsv": {
-      "size": 131,
-      "sha256": "406cc21ad454e30cffdacd26050b0dcf5af82ca9d0240bf947134d945ce8a9d2"
-    },
-    "demo/provenance.json": {
-      "size": 3429,
-      "sha256": "2849942e8d9a3c25bb78d195a73b9daec874f86c444cc01c51177bbc2601ef44"
-    },
     "demo/experiments.csv": {
-      "size": 615,
-      "sha256": "5550042985bffdc5df525f74bc203583d6dffd3bbb3b23534d5a857dd22d366c"
-    },
-    "demo/README.md": {
-      "size": 1424,
-      "sha256": "9a7de9e9e988a73a8ceb175eca28c47822abf9e36a9e031d921533877c6c289c"
-    },
-    "demo/expected_classes.csv": {
-      "size": 235,
-      "sha256": "cdb34218922fe8f8cfce14ec11e3e1f2686f4dd7d7a83979a904ebe2cb3dcc66"
-    },
-    "demo/expected_predictions.csv": {
-      "size": 258,
-      "sha256": "489e78ba1692de9d67905f01b3d0c049deea3dd9f617abb82968e2c174daffda"
+      "size": 555,
+      "sha256": "65d9ca4e01b60d3db8ba8ad2f0bd8c60785bbaa7c2a6cc5a0a6dac8667d8b526"
     },
     "demo/predict.csv": {
       "size": 131,
@@ -350,12 +330,12 @@
       "sha256": "efdc86629ed5e9bd6be8c62b3845d6956c6c48deed8dc6edcf5177274ce0e98c"
     },
     "docs/MODELS_AND_DATA.md": {
-      "size": 4227,
-      "sha256": "dc4b30981b5868afe78fe96186fbd5f75ce0bc67048557bd157e86c2d0be50a7"
+      "size": 4270,
+      "sha256": "9b222f7d906cca92bb1186d2af7ac6dd999d38bc66d6fc57d96391b7ea05da7f"
     },
     "docs/MODELS_AND_DATA-Zh.md": {
-      "size": 3412,
-      "sha256": "c18e8e7ffb0e6d65c13023e05b06ad256911b8440916be01947dffb9bf377a40"
+      "size": 3446,
+      "sha256": "4870a114505cc78eb0d060a5ce2b9ec394ca6246e4bde534d7dd50d622f63ca4"
     },
     "mdramp/preference_features.py": {
       "size": 4613,

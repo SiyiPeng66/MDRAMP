@@ -1,7 +1,0 @@
-id,expected_class,criterion
-Test1,positive,predicted MIC <=128
-Test2,positive,predicted MIC <=128
-Test3,positive,predicted MIC <=128
-Test4,negative,predicted MIC >256
-Test5,negative,predicted MIC >256
-Test6,negative,predicted MIC >256
