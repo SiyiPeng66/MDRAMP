@@ -135,7 +135,7 @@ Test1,FLRRLVKWLKKM
 
 ### Candidate generation: `generate`
 
-Sample the pretrained generator, filter and deduplicate sequences, exclude previously tested exact sequences, then rank candidates by the selected model's composite score `R_t`. No input file is required.
+Sample the pretrained generator, filter and deduplicate sequences, optionally exclude supplied previously tested sequences with `--exclude FILE`, then rank candidates by the selected model's composite score `R_t`. No input file is required.
 
 ```bash
 python main.py generate --count 100 --details --output-dir runs/candidates
@@ -164,3 +164,7 @@ See [model and data notes](docs/MODELS_AND_DATA.md) for asset versions, training
 ```bash
 python -m pytest -q
 ```
+
+## Study data
+
+The full experimental dataset and derived candidate tables are provided in the manuscript supplementary materials, not in this repository. The six explicitly selected demo sequences are included for testing. Use `--exclude FILE` during generation to exclude sequences supplied in FASTA or tabular format.

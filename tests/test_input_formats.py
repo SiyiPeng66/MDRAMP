@@ -49,7 +49,7 @@ def test_best_censoring_and_conflict(tmp_path):
 def test_demo_matches_contract():
     root=Path(__file__).resolve().parents[1]
     seq=read_sequences(root/'demo/predict.fasta')
-    assert len(seq)==3
+    assert len(seq)==6
     pd.testing.assert_frame_equal(seq,read_sequences(root/'demo/predict.csv'))
     obs=read_experiments(root/'demo/experiments.csv')
     assert len(obs)==18

@@ -8,10 +8,10 @@ def main():
  out.mkdir(parents=True)
  for name in ['main.py','README.md','README-Zh.md','requirements.txt','pyproject.toml','environment.yml','.gitignore']:
   shutil.copy2(ROOT/name,out/name)
- for name in ['mdramp','src','tests','demo','templates','deliverables']:
+ for name in ['mdramp','src','tests','demo','templates']:
   shutil.copytree(ROOT/name,out/name,ignore=shutil.ignore_patterns('__pycache__','*.pyc','.DS_Store'))
  (out/'data').mkdir()
- for name in ['public','release']:shutil.copytree(ROOT/'data'/name,out/'data'/name,ignore=shutil.ignore_patterns('*.npz','.feature_cache','.hf_cache','.cache'))
+ for name in ['public']:shutil.copytree(ROOT/'data'/name,out/'data'/name,ignore=shutil.ignore_patterns('*.npz','.feature_cache','.hf_cache','.cache'))
  (out/'configs').mkdir()
  for name in ['requirements-runtime.lock.txt']:shutil.copy2(ROOT/'configs'/name,out/'configs'/name)
  # Publish runtime configuration and the panel definition used by tests.

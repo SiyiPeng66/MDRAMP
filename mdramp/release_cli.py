@@ -19,6 +19,7 @@ def parser():
    q.add_argument('--epochs',type=int,default=100);q.add_argument('--learning-rate',type=float,default=1e-4);q.add_argument('--batch-size',type=int,default=32)
   if name=='calibrate':q.add_argument('--mic-divisor',type=float,default=10.);q.add_argument('--update-final',action='store_true')
   if name=='generate':
+   q.add_argument('--exclude',help='Optional FASTA or table of previously tested sequences')
    q.add_argument('--count',type=int,default=100);q.add_argument('--pool-multiplier',type=int,default=3);q.add_argument('--max-proposals',type=int,default=20000);q.add_argument('--temperature',type=float,default=1.);q.add_argument('--top-p',type=float,default=.95)
  return p
 
@@ -47,7 +48,7 @@ def run_generate(a):
  if not generator.is_file():raise FileNotFoundError(f'Model generator asset missing: {generator}')
  model,ckpt=load(generator,'cpu')
  if ckpt.get('conditional'):raise ValueError('Expected unconditional generator')
- known=set(pd.read_csv(ROOT/'data/release/source_rows.csv').sequence);seen=set();selected=[];attempts=0
+ known=set(read_sequences(a.exclude).sequence) if getattr(a,'exclude',None) else set();seen=set();selected=[];attempts=0
  with fresh_output(a.output_dir) as out:
   while len(selected)<a.count*a.pool_multiplier and attempts<a.max_proposals:
    proposals=draw(model,min(64,a.max_proposals-attempts),'cpu',64,a.top_p,a.temperature);attempts+=len(proposals)

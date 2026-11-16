@@ -135,7 +135,7 @@ Test1,FLRRLVKWLKKM
 
 ### 候选生成：`generate`
 
-从预训练生成器采样，经筛选、去重并精确排除已测序列后，按所选模型的综合评分 `R_t` 排序。无需输入文件。
+从预训练生成器采样，经筛选、去重并通过 `--exclude FILE` 排除所提供的已测序列后，按所选模型的综合评分 `R_t` 排序。无需输入文件。
 
 ```bash
 python main.py generate --count 100 --details --output-dir runs/candidates
@@ -164,3 +164,7 @@ FinalModel 使用调整后的 MIC 标签及排名偏好拟合，输出属于模�
 ```bash
 python -m pytest -q
 ```
+
+## 研究数据
+
+完整实验数据及其候选预测表随论文补充材料提供，不纳入本仓库。仓库仅保留已选定的六条 Demo 序列用于测试。生成时可用 `--exclude FILE` 指定 FASTA 或表格文件，排除其中的已测序列。

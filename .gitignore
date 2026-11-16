@@ -27,3 +27,7 @@ releases/
 .release-deps/
 
 data/public/.hf_cache/
+
+# Study experiments and derived tables are distributed as supplementary materials.
+data/release/
+deliverables/

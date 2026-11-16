@@ -20,11 +20,11 @@ Calibration aggregates observations to the best peptide-level MIC interval acros
 
 FinalModel was trained with adjusted labels and explicit ranking preferences. Those preferences were fitted within fixed candidate sets; ranks depend on the set being scored. Model outputs do not establish independent predictive accuracy. Demo peptides were part of calibration. Per-observation attribution is retained in `demo/provenance.json` and explained in `demo/README.md`.
 
-Generation samples the pretrained autoregressive policy, applies physicochemical filters, excludes previously tested exact sequences and reranks using the selected MIC model. It is not a new reinforcement-learning run per request or experimental safety validation.
+Generation samples the pretrained autoregressive policy, applies physicochemical filters, optionally excludes sequences supplied with `--exclude` and reranks using the selected MIC model. It is not a new reinforcement-learning run per request or experimental safety validation.
 
 ## Study data
 
-`data/release/` contains experimental records, panel information and prediction tables. `deliverables/R0-R5_Candidates.xlsx` has six worksheets of 100 candidates: 170 round-assigned original peptides and 430 generated supplements. Another 60 original peptides had no round assignment and are omitted from this workbook. `Synthesized` distinguishes original experimental peptides from supplements.
+The full experimental records and derived candidate tables are provided in the manuscript supplementary materials. Only the six selected demo sequences are distributed here.
 
 ## Reproducibility
 
