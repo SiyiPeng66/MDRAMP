@@ -122,7 +122,7 @@ python main.py predict --input demo/predict.fasta --details --output-dir runs/pr
 
 ```csv
 id,sequence
-AMP-DN01,FLRRLVKWLKKM
+Test1,FLRRLVKWLKKM
 ```
 
 | Option | Default | Description |
