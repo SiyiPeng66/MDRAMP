@@ -36,3 +36,11 @@ assets/.download.lock
 
 # Local documentation is not published.
 /docs/
+
+/scripts/
+
+/tests/
+
+/MANIFEST.json
+
+/.github/workflows/tests.yml
