@@ -17,7 +17,7 @@ def parser():
   if name in ['predict','generate']:q.add_argument('--details',action='store_true')
   if name in ['train','calibrate']:
    q.add_argument('--epochs',type=int,default=100);q.add_argument('--learning-rate',type=float,default=1e-4);q.add_argument('--batch-size',type=int,default=32)
-  if name=='calibrate':q.set_defaults(mic_divisor=10.);q.add_argument('--update-final',action='store_true')
+  if name=='calibrate':q.set_defaults(mic_divisor=1.);q.add_argument('--update-final',action='store_true')
   if name=='generate':
    q.add_argument('--exclude',help='Optional FASTA or table of previously tested sequences')
    q.add_argument('--count',type=int,default=100);q.add_argument('--pool-multiplier',type=int,default=3);q.add_argument('--max-proposals',type=int,default=20000);q.add_argument('--temperature',type=float,default=1.);q.add_argument('--top-p',type=float,default=.95)

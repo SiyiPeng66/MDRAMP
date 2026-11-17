@@ -97,7 +97,7 @@ python main.py predict --model runs/calibration/model.pt --input demo/predict.fa
 | `strain` | No | Experimental strain, for traceability. |
 | `round` | No | Experimental round. |
 
-See [`demo/experiments.csv`](demo/experiments.csv) for an example input. The best MIC interval across strains is used for each sequence. The default target is **divided by 10**; do not pre-divide inputs.
+See [`demo/experiments.csv`](demo/experiments.csv) for an example input. The best MIC interval across strains is used for each sequence. MIC labels are used as supplied, without rescaling.
 
 | Option | Default | Description |
 |---|---|---|

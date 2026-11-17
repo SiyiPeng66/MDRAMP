@@ -81,7 +81,7 @@ python main.py predict --model runs/calibration/model.pt --input demo/predict.fa
 | `strain` | 否 | 实验菌株，用于追溯。 |
 | `round` | 否 | 实验轮次。 |
 
-输入示例见 [`demo/experiments.csv`](demo/experiments.csv)。
+输入示例见 [`demo/experiments.csv`](demo/experiments.csv)。每条序列使用跨菌株最优 MIC 区间，直接使用输入的 MIC 标签，不进行缩放。
 | 参数 | 默认值 | 说明 |
 |---|---|---|
 | `--input FILE` | 必填 | 实验数据表。 |

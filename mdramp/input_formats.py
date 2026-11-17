@@ -114,7 +114,7 @@ def read_experiments(path):
     return frame.reset_index(drop=True)
 
 
-def aggregate_best(frame, divisor=10):
+def aggregate_best(frame, divisor=1):
     """Return one best-strain interval per sequence, with original bounds retained.
 
     For observations X_i in [L_i,U_i], min(X_i) is bounded by
