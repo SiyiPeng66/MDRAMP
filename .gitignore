@@ -44,3 +44,5 @@ assets/.download.lock
 /MANIFEST.json
 
 /.github/workflows/tests.yml
+
+/templates/
