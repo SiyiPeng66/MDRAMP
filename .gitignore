@@ -33,3 +33,6 @@ data/release/
 deliverables/
 
 assets/.download.lock
+
+# Local documentation is not published.
+/docs/

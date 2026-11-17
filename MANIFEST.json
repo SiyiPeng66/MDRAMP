@@ -18,8 +18,8 @@
       "sha256": "8d91ac20fafdbbab88b8c6ac7cbae729cdba80b9f3e11d9d0493cddfe58c2bb2"
     },
     ".gitignore": {
-      "size": 616,
-      "sha256": "b8fc1077c75491aa83b9e5660e57488b717584efb04b13da9f3e09de5d839657"
+      "size": 687,
+      "sha256": "8f4560faf7b57b7d66a0d5684a9fe5cfbd53aec92601a72478da72fc23056ff4"
     },
     "main.py": {
       "size": 593,
@@ -329,14 +329,6 @@
       "size": 3422,
       "sha256": "efdc86629ed5e9bd6be8c62b3845d6956c6c48deed8dc6edcf5177274ce0e98c"
     },
-    "docs/MODELS_AND_DATA.md": {
-      "size": 4270,
-      "sha256": "9b222f7d906cca92bb1186d2af7ac6dd999d38bc66d6fc57d96391b7ea05da7f"
-    },
-    "docs/MODELS_AND_DATA-Zh.md": {
-      "size": 3446,
-      "sha256": "4870a114505cc78eb0d060a5ce2b9ec394ca6246e4bde534d7dd50d622f63ca4"
-    },
     "mdramp/preference_features.py": {
       "size": 4613,
       "sha256": "1bf77252104b7c6d74bf686a9ec07ed273bef1bc476d29b224cd82f11788546f"
@@ -538,8 +530,8 @@
       "sha256": "ca1897f12623045ac15a72b7f26ece42c0de6e5d18c413f5ba2fee9c434dffdb"
     },
     "scripts/package_release.py": {
-      "size": 1879,
-      "sha256": "1922b6c716f4752b7d58a539b8ca8f0a709e187efc7b05b693354ebaa07f5d39"
+      "size": 1716,
+      "sha256": "4b5da240b1e8e0316a00498e731b3372a5afbdbb0baa895e3f78ee3e789cc09b"
     },
     "templates/experiments.csv": {
       "size": 29,

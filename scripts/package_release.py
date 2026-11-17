@@ -19,9 +19,6 @@ def main():
   destination=out/'configs'/name;destination.parent.mkdir(parents=True,exist_ok=True)
   shutil.copy2(ROOT/'configs'/name,destination)
  shutil.copytree(ROOT/'.github',out/'.github')
- (out/'docs').mkdir()
- for name in ['MODELS_AND_DATA.md','MODELS_AND_DATA-Zh.md']:
-  if (ROOT/'docs'/name).exists():shutil.copy2(ROOT/'docs'/name,out/'docs'/name)
  (out/'scripts').mkdir();shutil.copy2(__file__,out/'scripts/package_release.py')
  files={str(f.relative_to(out)):{'size':f.stat().st_size,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()} for f in out.rglob('*') if f.is_file()}
  (out/'MANIFEST.json').write_text(json.dumps({'format':1,'files':files},indent=2))
