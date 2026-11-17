@@ -34,15 +34,6 @@ python main.py train
 
 结果保存到 `runs/` 下的新目录。通过 `--output-dir DIR` 指定输出位置，使用 `--help` 查看命令选项。
 
-## 模型
-
-| 模型 | 用途 |
-|---|---|
-| **BaseModel** | 公开数据训练的专家与生成器；需经实验校准后才能预测 MIC。 |
-| **FinalModel** | 校准后的模型，默认用于预测、继续校准及候选评分。 |
-
-通过 `--model BaseModel` 或 `--model path/to/model.pt` 指定其他起始模型。自定义权重需附带 `scorer.json`。校准默认保存新模型，增加 `--update-final` 才会将其设为默认模型。
-
 ## 子命令说明
 
 所有命令均支持以下公共参数：
@@ -80,7 +71,7 @@ python main.py calibrate --input demo/experiments.csv --output-dir runs/calibrat
 python main.py predict --model runs/calibration/model.pt --input demo/predict.fasta
 ```
 
-**输入：** CSV、TSV 或 XLSX（首个工作表），每行一条观测，列名区分大小写。
+**输入：** CSV或者TSV格式文件，每行一条观测，列名区分大小写。输入文件的每一列的内容和定义如下：
 
 | 列名 | 必需 | 说明 |
 |---|---|---|
@@ -90,8 +81,7 @@ python main.py predict --model runs/calibration/model.pt --input demo/predict.fa
 | `strain` | 否 | 实验菌株，用于追溯。 |
 | `round` | 否 | 实验轮次。 |
 
-输入示例见 [`demo/experiments.csv`](demo/experiments.csv)。每条序列使用跨菌株最优 MIC 区间，默认标签**除以 10**，请勿提前缩放输入。使用 `--mic-divisor 1` 可保留原始尺度。
-
+输入示例见 [`demo/experiments.csv`](demo/experiments.csv)。
 | 参数 | 默认值 | 说明 |
 |---|---|---|
 | `--input FILE` | 必填 | 实验数据表。 |
@@ -99,7 +89,6 @@ python main.py predict --model runs/calibration/model.pt --input demo/predict.fa
 | `--epochs N` | `100` | 校准轮数。 |
 | `--batch-size N` | `32` | 校准批大小。 |
 | `--learning-rate X` | `0.0001` | 校准学习率。 |
-| `--mic-divisor X` | `10` | 训练 MIC 标签使用的正数除数。 |
 | `--update-final` | 关闭 | 校准成功后，将新模型注册为默认 FinalModel。 |
 
 **输出：** `model.pt`、`scorer.json`、`calibration.csv`（`id`、`sequence`、`before_mic`、`after_mic`）、处理后的观测/标签及训练追溯记录。从 BaseModel 初始化时，`before_mic` 为空。移动校准模型时，应保留其配置引用的共享资产。

@@ -97,7 +97,7 @@ python main.py predict --model runs/calibration/model.pt --input demo/predict.fa
 | `strain` | No | Experimental strain, for traceability. |
 | `round` | No | Experimental round. |
 
-See [`demo/experiments.csv`](demo/experiments.csv) for an example input. The best MIC interval across strains is used for each sequence. The default target is **divided by 10**; do not pre-divide inputs. Use `--mic-divisor 1` for unscaled labels.
+See [`demo/experiments.csv`](demo/experiments.csv) for an example input. The best MIC interval across strains is used for each sequence. The default target is **divided by 10**; do not pre-divide inputs.
 
 | Option | Default | Description |
 |---|---|---|
@@ -106,7 +106,6 @@ See [`demo/experiments.csv`](demo/experiments.csv) for an example input. The bes
 | `--epochs N` | `100` | Calibration epochs. |
 | `--batch-size N` | `32` | Calibration batch size. |
 | `--learning-rate X` | `0.0001` | Calibration learning rate. |
-| `--mic-divisor X` | `10` | Positive divisor applied to training MIC labels. |
 | `--update-final` | Off | Register the successfully calibrated model as the default FinalModel. |
 
 **Outputs:** `model.pt`, `scorer.json`, `calibration.csv` (`id`, `sequence`, `before_mic`, `after_mic`), processed observations/targets and training provenance. `before_mic` is empty when initializing from BaseModel. Preserve referenced shared assets when moving a calibrated bundle.
