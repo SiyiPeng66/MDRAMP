@@ -142,15 +142,20 @@ Sample the pretrained generator, filter and deduplicate sequences, optionally ex
 python main.py generate --count 100 --details --output-dir runs/candidates
 ```
 
-| Option | Default | Description |
-|---|---|---|
-| `--model MODEL` | `FinalModel` | Model used to score candidates; requires a MIC head. |
-| `--count N` | `100` | Number of candidates to return. |
-| `--pool-multiplier N` | `3` | Target eligible pool size relative to `count`; sampling batches may exceed it. |
-| `--max-proposals N` | `20000` | Maximum sampled sequences before filtering. |
-| `--temperature X` | `1.0` | Positive sampling temperature. |
-| `--top-p X` | `0.95` | Nucleus sampling probability, `0 < X ≤ 1`. |
-| `--details` | Off | Also save expert scores and `R_t` in `details.csv`. |
+| Option | Default | Principle and role | Accepted values | Effect of adjustment |
+|---|---|---|---|---|
+| `--model MODEL` | `FinalModel` | Loads the bundle's generator and ranks candidates using its MIC head and composite score `R_t`. | `FinalModel` or a calibrated `.pt`/`scorer.json` path; uncalibrated BaseModel is not accepted. | Changing bundles can change sampling, MIC and ranks; changing only the MIC head primarily changes scoring and selection. |
+| `--count N` | `100` | Returns the top N eligible candidates ranked by `R_t`. | Integer, `N ≥ 1` and `N ≤ max-proposals`. | Higher values return more candidates and proportionally enlarge the target pool, usually increasing runtime; they do not imply higher mean activity. |
+| `--pool-multiplier N` | `3` | Sets the target eligible pool to `count × N` before selecting `count` candidates. | Integer, `N ≥ 1`, subject to `max-proposals`. | Higher values broaden the selection pool and usually increase computation; scores need not improve monotonically. Sampling stops at the target, with possible batch overshoot. |
+| `--max-proposals N` | `20000` | Caps the number of sequences sampled before filtering and deduplication. | Integer, `N ≥ count`. | Higher values allow more attempts when duplicates or rejected sequences are common, potentially increasing runtime. The full budget is not used once the target pool is reached. |
+| `--temperature X` | `1.0` | Divides next-token logits by X before converting them to probabilities. | Finite real number, `X > 0`. | Higher values flatten probabilities, usually increasing diversity and randomness but potentially rejection rates. Lower values favor high-probability residues and can increase repetition. `1` retains the original logit scale. |
+| `--top-p X` | `0.95` | Retains the smallest descending-probability token set whose cumulative probability reaches X, then samples from it. | Real number, `0 < X ≤ 1`. | Higher values admit more low-probability choices and usually increase diversity. Lower values concentrate sampling and can increase repetition. `1` disables probability-tail truncation; length and token constraints still apply. |
+| `--exclude FILE` | Unset | Excludes exact sequences listed in the input file. | FASTA, CSV, TSV or XLSX; tables require `sequence`. | More exclusions reduce the eligible pool and may require a larger sampling budget; similar sequences are not automatically excluded. |
+| `--details` | Off | Saves expert scores and `R_t` to a separate `details.csv`. | Flag; no value required. | Adds output fields without changing sampling, MIC predictions or ranks. |
+
+For example, `--count 100 --pool-multiplier 3` targets 300 eligible unique sequences and returns the highest-scoring 100. If the proposal limit is reached with 100–299 eligible sequences, the best 100 are still returned; fewer than 100 causes an error.
+
+Temperature is applied before top-p truncation. Both control sampling diversity; greater diversity does not establish greater antimicrobial activity, which still requires scoring and experimental confirmation.
 
 **Outputs:** `candidates.csv` (`rank`, `id`, `sequence`, `predicted_mic` in μg/mL), `candidates.fasta` and `run.json`. Increase `--max-proposals` if too few candidates pass the filters.
 
